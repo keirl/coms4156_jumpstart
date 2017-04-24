@@ -15,16 +15,38 @@ Side benefits:
 1. Download and install VirtualBox.
 2. Download Ubuntu 14.04.
 3. Install Ubunut 14.04.
-4. Update Ubuntu.
+4. Setup your VirtualBox
+  - # CPUs, memory.
+  - Shared clipboard.
+5. Update Ubuntu.
+6. Install VirtualBox additions.
+  Ubuntu 14.04 has a VirtualBox additions built in; however it is often out of date.
+  - Mount .iso in virtualbox
+  - Run additions
 
-## Install Python
+
+## Install Local Files
+- Install Git
+  sudo apt-get install git
+- Install Google Cloud https://cloud.google.com/sdk/docs/#deb
+  sudo apt-get install google-cloud-sdk
+
 
 Setup using virtualenv 
 
+## Setup Git Account
+- Create an account
+- Create and install SSH and GPG keys
 
 
 
 # Continuous Deployment
+
+
+
+## Travis Account
+
+## Google Cloud Account
 Create a Google Cloud account using your Columbia account.  
 > Author's note: Easier to get academic credits, etc. if linked to you columbia.edu account.
 
