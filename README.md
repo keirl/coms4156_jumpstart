@@ -27,10 +27,15 @@ Side benefits:
 
 ## Install Local Files
 - Install Git
-  sudo apt-get install git
-- Install Google Cloud https://cloud.google.com/sdk/docs/#deb
-  sudo apt-get install google-cloud-sdk
 
+  `sudo apt-get install git`
+- Install Google Cloud https://cloud.google.com/sdk/docs/#deb
+
+  `sudo apt-get install google-cloud-sdk`
+- Before running or deploying this application, install the dependencies using
+ [pip](http://pip.readthedocs.io/en/stable/):
+ 
+     `pip install -t lib -r requirements.txt`
 
 Setup using virtualenv 
 
