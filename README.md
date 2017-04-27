@@ -30,10 +30,6 @@ Side benefits:
   sudo apt-get install git
 - Install Google Cloud https://cloud.google.com/sdk/docs/#deb
   sudo apt-get install google-cloud-sdk
-- Before running or deploying this application, install the dependencies using
-[pip](http://pip.readthedocs.io/en/stable/):
-
-    pip install -t lib -r requirements.txt
 
 
 Setup using virtualenv 
@@ -55,5 +51,3 @@ Create a Google Cloud account using your Columbia account.
 > Author's note: Easier to get academic credits, etc. if linked to you columbia.edu account.
 
 Follow the guidelines at https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env
-
-
