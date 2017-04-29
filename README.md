@@ -24,9 +24,9 @@ There are some side benefits as well, namely, you can destroy and rebuild the VM
 
 
 #### Install Local Files (Ubuntu 14.04 Commands)
-Install Git, Pip, Virtualenv, [Google Cloud SDK] (https://cloud.google.com/sdk/docs/#deb)
+Install Git, Pip, Virtualenv, [Google Cloud SDK](https://cloud.google.com/sdk/docs/#deb)
 
-    ```sudo apt-get install git python-pip
+    sudo apt-get install git python-pip
     sudo pip install virtualenv
     # The following is to install Google SDK    
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
@@ -35,8 +35,11 @@ Install Git, Pip, Virtualenv, [Google Cloud SDK] (https://cloud.google.com/sdk/d
     sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 #### Setup GitHub.com Account
-Create an [account](https://github.com/)
-Create and install [SSH](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) and GPG keys (https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/)
+Create a GitHub [account](https://github.com/).
+
+Create and install [SSH](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) keys.
+
+Create and install [GPG keys](https://help.github.com/articles/adding-a-new-gpg-key-to-your-github-account/).
 
 #### Fork coms4156_jumpstart Repository
 Go to [coms4156_jumpstart](https://github.com/keirl/coms4156_jumpstart) and click the Fork button in the upper right hand side.
@@ -55,16 +58,15 @@ If everything worked you will see `(env)` before your command prompt, e.g. `(env
 Everytime you want to work on your Flask application, you will need to run `source env/bin/activate`.  When you done working on the app you run `deactivate`.
 
 #### Python Dependencies
-- Before running or deploying this application, install the dependencies using
- [pip](http://pip.readthedocs.io/en/stable/):
+Before running or deploying this application, install the dependencies using [pip](http://pip.readthedocs.io/en/stable/):
  
      `pip install -r requirements.txt`
 
-- Check that Flask is listed
+Check that Flask is listed
     
     `pip list`
 
-    ```appdirs (1.4.3)
+    appdirs (1.4.3)
     click (6.7)
     Flask (0.12.1)
     itsdangerous (0.24)
@@ -79,13 +81,14 @@ Everytime you want to work on your Flask application, you will need to run `sour
     wheel (0.29.0)
 
 #### Test the local environment
-- Run the Flask application 
-    ```export FLASK_APP=main.py
+Run the Flask application 
+    
+    export FLASK_APP=main.py
     flask run
 
-- Navigate to the local web site at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+Navigate to the local web site at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
-- Congratulations! You have a webapp up and running.
+Congratulations! You have a webapp up and running.
 
 
 ## Continuous Deployment
@@ -93,21 +96,25 @@ Everytime you want to work on your Flask application, you will need to run `sour
 #### Verify GitHub is configured correctly.
 Make a change.  Edit `README.md` to include your name and team name.
 
-    ```git add README.md
+    git add README.md
     git commit -m "Added my name to the README file."
     git push
 
 If you have never run the `git push` on this (virtual) machine to GitHub you will get a prompt to set up your configuration:
-  ```git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
+
+    git config --global user.email "you@example.com"
+    git config --global user.name "Your Name"
 
 Verify that your change to the README shows up on GitHub.com.
 
 #### Travis Account
+Go to [Travis CI](https://travis-ci.com/) and sign in with your GitHub.  Only one person on the team needs to do this.  This person must be the owner of the repository.  
+
+Additional guidance on setting up Travis CI for Python is available at [Travis CI](https://docs.travis-ci.com/user/languages/python/).
 
 #### Google Cloud Account
 Create a Google Cloud account using your Columbia account.  
 > Author's note: Easier to get academic credits, etc. if linked to you columbia.edu account.
 
-Follow the guidelines at https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env
+Follow the guidelines from [Google](https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env)
 
