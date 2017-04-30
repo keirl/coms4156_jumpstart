@@ -27,9 +27,9 @@ There are some side benefits as well, namely, you can destroy and rebuild the VM
 
 
 #### Install Local Files (Ubuntu 14.04 Commands)
-Install Git, Pip, Virtualenv, [Google Cloud SDK](https://cloud.google.com/sdk/docs/#deb)
+Install Git, Pip, Virtualenv, Ruby, [Google Cloud SDK](https://cloud.google.com/sdk/docs/#deb)
 
-    sudo apt-get install git python-pip
+    sudo apt-get install git python-pip ruby ruby-dev
     sudo pip install virtualenv
     # The following is to install Google SDK    
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
@@ -52,7 +52,7 @@ Clone the repository to your local machine.  `git clone git@github.com:keirl/com
 #### Creating a virtualenv (optional, but recommended)
 Before running or deploying this application, install `virtualenv`.  The step is optional but it helps manage your python dependencies.  If you installed a Virtual Machine dedicated to COMS 4156, so do not need to use virtualenv; however, if you are running natively, then we recommend it and so do [others](https://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/).  More information is [here](https://virtualenv.pypa.io/en/stable/installation/)
 
-	```cd ~/coms4156_jumpstart/
+	cd ~/coms4156_jumpstart/
     virtualenv env
     source env/bin/activate
 
@@ -159,7 +159,9 @@ Verify that it is deployed by
 We strongly recommend that you browse the App Engine docs to get a feel for what is happening under the hood.
 
 #### Connect Travis to App Engine for Continuous Deployment
-You are going to follow the guide [here](https://docs.travis-ci.com/user/deployment/google-app-engine/), [here](https://cloud.google.com/solutions/continuous-delivery-with-travis-ci), and [here](https://blog.travis-ci.com/2013-01-14-new-client/)
+You are going to follow the guide [here](https://docs.travis-ci.com/user/deployment/google-app-engine/), [here](https://cloud.google.com/solutions/continuous-delivery-with-travis-ci), and [here](https://blog.travis-ci.com/2013-01-14-new-client/).
+
+Assuming you installed Ruby earlier, simply call `sudo gem install travis`
 
 #### Advanced things to look into...
 You can integrate GitHub into Slack so that you see all commits.  You can do the same with [Travis builds](https://docs.travis-ci.com/user/notifications/#Configuring-slack-notifications).  
