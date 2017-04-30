@@ -1,6 +1,9 @@
 # coms4156_jumpstart
 Jumpstart Project for Columbia University's COMS 4156
 
+## Getting Started
+One person will need to be "Devops" for the duration of the project (pick someone who won't drop the class.)  This person will need to own the GitHub repo and all the other tools.  
+
 
 
 ## Local Installation
@@ -53,6 +56,8 @@ Before running or deploying this application, install `virtualenv`.  The step is
     virtualenv env
     source env/bin/activate
 
+> You might be thinking why should I use virtualenv?  Then you did not read the links above.  In short, virtualenv isolates the libraries used in this project from other projects.  This ensures that external package changes do not impact your development or project because you are only using a specific version (defined in `requirements.txt`).  If you have more than one project ongoing, it makes it so that changes to one do not break others.  Why should you do it for this project on a fresh VM dedicated to one project?  That is less compelling, but it is something that everyone working in Python, so we'll just say professional development.
+
 If everything worked you will see `(env)` before your command prompt, e.g. `(env) user@vm4156:~/coms4156_jumpstart`.
 
 Everytime you want to work on your Flask application, you will need to run `source env/bin/activate`.  When you done working on the app you run `deactivate`.
@@ -80,6 +85,8 @@ Check that Flask is listed
     Werkzeug (0.12.1)
     wheel (0.29.0)
 
+You should also update the requirements.txt file, `pip freeze > requirements.txt`.  One of the key benefits of using virtualenv is that only the libraries being used in the project 
+
 #### Test the local environment
 Run the Flask application 
     
@@ -104,17 +111,61 @@ If you have never run the `git push` on this (virtual) machine to GitHub you wil
 
     git config --global user.email "you@example.com"
     git config --global user.name "Your Name"
+    git config --global push.default matching
 
 Verify that your change to the README shows up on GitHub.com.
 
 #### Travis Account
-Go to [Travis CI](https://travis-ci.com/) and sign in with your GitHub.  Only one person on the team needs to do this.  This person must be the owner of the repository.  
+Go to [Travis CI](https://travis-ci.com/) and sign in with your GitHub.  Only one person on the team needs to do this.  This person must be the owner of the repository.
+
+Follow their prompts to turn on Travis for this repo (short for repository).  
+
+Test that Travis is working as expected.  Make another change and see whether the build passes.  It normally takes about 5 minutes, so go get a cup of coffee from Blue Java.
 
 Additional guidance on setting up Travis CI for Python is available at [Travis CI](https://docs.travis-ci.com/user/languages/python/).
 
-#### Google Cloud Account
-Create a Google Cloud account using your Columbia account.  
+#### Setup Google Cloud Account
+Create a Google Cloud account using your Columbia account at [https://cloud.google.com/](https://cloud.google.com/)
 > Author's note: Easier to get academic credits, etc. if linked to you columbia.edu account.
 
-Follow the guidelines from [Google](https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env)
+Create a new project, say COMS4156.  The name does not really matter.  They will give you a cute name from your project name, e.g. "astute-anagram-165723".
 
+#### Setup Google Cloud App Engine
+Navigate to [https://cloud.google.com/appengine/](https://cloud.google.com/appengine/) and then select "View my console."
+
+You may want to follow their "My First App Tutorial."  It will help you understand how app engine works.
+
+Follow the guidelines from [Google](https://cloud.google.com/appengine/docs/standard/python/getting-started/python-standard-env) and [QuickStart](https://cloud.google.com/appengine/docs/standard/python/quickstart).
+
+    gcloud init
+
+Google will have you sign into your Google account.  Use the one that you signed up for Google Cloud with.
+
+We've setup the configuration files: `app.yaml` and `appengine_config.py`.  If you do more advanced functionality, you may need to change `app.yaml` and Google's docs are good at describing the various settings.  `appengine_config.py` just tells App Engine where to look for libraries.  Speaking of which...
+
+#### Deploy the Application
+You'll need to install the libraries again to put them in the right place for App Engine (`lib/`).  `env/lib` has these files plus many more.  This will only need to be run initially and then whenever a new module is added.
+
+    pip install -t lib -r requirements.txt
+
+Now deploy the application to App Engine.
+
+    gcloud app deploy
+
+Verify that it is deployed by 
+
+    gcloud app browse
+
+We strongly recommend that you browse the App Engine docs to get a feel for what is happening under the hood.
+
+#### Connect Travis to App Engine for Continuous Deployment
+You are going to follow the guide [here](https://docs.travis-ci.com/user/deployment/google-app-engine/), [here](https://cloud.google.com/solutions/continuous-delivery-with-travis-ci), and [here](https://blog.travis-ci.com/2013-01-14-new-client/)
+
+#### Advanced things to look into...
+You can integrate GitHub into Slack so that you see all commits.  You can do the same with [Travis builds](https://docs.travis-ci.com/user/notifications/#Configuring-slack-notifications).  
+
+The Google Cloud app is pretty good and allows you to see the console from your phone.  Can be helpful if you are helping someone debug. 
+
+Use tail to look at App Engine logs: `gcloud app logs tail -s default`.
+
+###Have fun!
