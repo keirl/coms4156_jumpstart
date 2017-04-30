@@ -23,12 +23,12 @@ engine = sqlalchemy.create_engine('postgres://ricardo:martinez@localhost/imhere'
 
 @app.before_request
 def before_request():
-    try:
-        g.conn = engine.connect()
-    except:
-        print 'uh oh, problem connecting to database'
-        import traceback
-        traceback.print_exc()
+    # try:
+    #     g.conn = engine.connect()
+    # except:
+    #     print 'uh oh, problem connecting to database'
+    #     import traceback
+    #     traceback.print_exc()
         g.conn = None
 
 
@@ -268,10 +268,11 @@ def view_class():
 def register():
     if request.method == 'GET':
         return render_template(
-                'register.html',
-                name=flask.session['google_user']['name'],
-                is_student=flask.session['is_student'],
-                is_teacher=flask.session['is_teacher'])
+                'register.html'#,
+                # name=flask.session['google_user']['name'],
+                # is_student=flask.session['is_student'],
+                # is_teacher=flask.session['is_teacher']
+        )
 
     elif request.method == 'POST':
         if request.form['type'] == 'student':
@@ -333,9 +334,11 @@ def oauth2callback():
         flask.session['id'] = um.get_or_create_user(user)
 
         # now add is_student and is_teacher to flask.session
-        im = index_model.Index(g.conn, flask.session['id'])
-        flask.session['is_student'] = True if im.is_student() else False
-        flask.session['is_teacher'] = True if im.is_teacher() else False
+        # im = index_model.Index(g.conn, flask.session['id'])
+        # flask.session['is_student'] = True if im.is_student() else False
+        # flask.session['is_teacher'] = True if im.is_teacher() else False
+        flask.session['is_student'] = False
+        flask.session['is_teacher'] = False
 
         redirect = flask.session['redirect']
         flask.session.pop('redirect', None)
