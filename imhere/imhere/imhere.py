@@ -276,7 +276,8 @@ def register():
         )
 
     elif request.method == 'POST':
-        ds = model.get_client()
+        m = model.Model()
+        ds = m.get_client()
         if request.form['type'] == 'student':
             # check that uni doesn't already exist
             # if it doesn't, continue student creation

@@ -31,4 +31,4 @@ class Users(Model):
         query = ds.query(kind='student')
         query.add_filter('uni', '=', uni)
         result = list(query.fetch())
-        return True if result.rowcount == 1 else False
+        return True if len(result) == 1 else False
