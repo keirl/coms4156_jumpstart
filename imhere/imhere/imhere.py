@@ -328,13 +328,13 @@ def oauth2callback():
         if 'columbia.edu' not in user['email']:
             return flask.redirect(flask.url_for('bademail'))
 
-        um = users_model.Users(g.conn)
+        um = users_model.Users()
 
         flask.session['google_user'] = user
         flask.session['id'] = um.get_or_create_user(user)
 
         # now add is_student and is_teacher to flask.session
-        # im = index_model.Index(g.conn, flask.session['id'])
+        # im = index_model.Index(flask.session['id'])
         # flask.session['is_student'] = True if im.is_student() else False
         # flask.session['is_teacher'] = True if im.is_teacher() else False
         flask.session['is_student'] = False

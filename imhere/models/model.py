@@ -1,19 +1,8 @@
+from google.cloud import datastore
+from flask import current_app
+
 class Model:
 
-    def __init__(self, dbconn):
-        self.db = dbconn
-
-    # transform the sqlalchemy ResultProxy into a python list
-    def deproxy(self, resultproxy):
-
-        result = []
-        for row in resultproxy:
-            result.append(row)
-
-        return result
-
-    def escape_string(self, input):
-        if type(input) is str or type(input) is unicode:
-            return input.replace("'", "''")
-        else:
-            return input
+    def get_client(self): # TODO fix the config file
+        #return datastore.Client(current_app.config['PROJECT_ID'])
+        return datastore.Client('cu-ase')

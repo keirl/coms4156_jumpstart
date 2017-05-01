@@ -1,12 +1,7 @@
-from flask import current_app
 from model import Model
 from google.cloud import datastore
 
 class Users(Model):
-
-    def get_client(self): # TODO fix the config file
-        #return datastore.Client(current_app.config['PROJECT_ID'])
-        return datastore.Client('cu-ase')
 
     def get_or_create_user(self, user):
         ds = self.get_client()
@@ -28,7 +23,7 @@ class Users(Model):
             except:  # TODO
                 pass
         result = list(query.fetch())
-        return self.deproxy(result)[0]['id']
+        return result[0]['id']
 
 
     def is_valid_uni(self, uni): # TODO convert to datastore
