@@ -45,9 +45,11 @@ def teacher_session():
 @app.before_request
 def student_session():
     if '/student/' in request.path:
+
         if 'credentials' not in flask.session:
             return flask.redirect(flask.url_for('index'))
         elif not flask.session['is_student']:
+            print "help i'm not a student?? " + str(flask.session['is_student'])
             return flask.redirect(flask.url_for('register'))
 
 
@@ -102,18 +104,22 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
-    im = index_model.Index(g.conn, flask.session['id'])
+    im = index_model.Index(flask.session['id'])
     if im.is_student():
+        print "i'm a student!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+        print flask.url_for('main_student')
         return flask.redirect(flask.url_for('main_student'))
     elif im.is_teacher():
         return flask.redirect(flask.url_for('main_teacher'))
     else:
+        print "i'm NOOOOT a student!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         return render_template('login.html', not_registered=True)
 
 
 @app.route('/student/', methods=['GET', 'POST'])
 def main_student():
-    sm = students_model.Students(g.conn, flask.session['id'])
+    print "yes i'm a student???????????"
+    sm = students_model.Students(flask.session['id'])
     courses = sm.get_courses()
     context = dict(data=courses)
 
@@ -270,9 +276,9 @@ def register():
     if request.method == 'GET':
         return render_template(
                 'register.html',
-                name=flask.session['google_user']['name']
-                # is_student=flask.session['is_student'],
-                # is_teacher=flask.session['is_teacher']
+                name=flask.session['google_user']['name'],
+                is_student=flask.session['is_student'],
+                is_teacher=flask.session['is_teacher']
         )
 
     elif request.method == 'POST':
@@ -344,12 +350,10 @@ def oauth2callback():
         flask.session['google_user'] = user
         flask.session['id'] = um.get_or_create_user(user)
 
-        # now add is_student and is_teacher to flask.session TODO fix this part for datastore
-        # im = index_model.Index(flask.session['id'])
-        # flask.session['is_student'] = True if im.is_student() else False
-        # flask.session['is_teacher'] = True if im.is_teacher() else False
-        flask.session['is_student'] = False
-        flask.session['is_teacher'] = False
+        # now add is_student and is_teacher to flask.session
+        im = index_model.Index(flask.session['id'])
+        flask.session['is_student'] = True if im.is_student() else False
+        flask.session['is_teacher'] = True if im.is_teacher() else False
 
         redirect = flask.session['redirect']
         flask.session.pop('redirect', None)

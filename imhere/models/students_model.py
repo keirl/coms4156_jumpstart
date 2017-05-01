@@ -13,16 +13,17 @@ class Students(Model):
         return result.fetchone()[0]
 
     def get_courses(self):
-        query = ('select courses.cid, courses.name, courses.start_time, '
-                 'courses.end_time, courses.start_date, courses.end_date, '
-                 'courses.day, courses.active '
-                 'from courses, enrolled_in '
-                 'where courses.cid = enrolled_in.cid '
-                 'and enrolled_in.sid = %s'
-                 % self.sid)
+        ds = self.get_client()
+        query = ds.query(kind='enrolled_in')
+        query.add_filter('sid', '=', self.sid)
+        enrolledCourses = list(query.fetch())
+        result = list()
+        for enrolledCourse in enrolledCourses:
+            query = ds.query(kind='courses')
+            query.add_filter('cid', '=', enrolledCourse.cid)
+            result.append(query.fetch())
 
-        result = self.db.execute(query)
-        return self.deproxy(result)
+        return result
 
     def get_secret_and_seid(self):
         now = datetime.time(datetime.now())

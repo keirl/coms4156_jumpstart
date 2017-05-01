@@ -8,12 +8,14 @@ class Index(Model):
 
     def is_student(self):
         ds = self.get_client()
-        query = 'select * from students where sid = %s' % self.uid
-        result = self.db.execute(query)
-        return True if result.rowcount == 1 else False
+        query = ds.query(kind='student')
+        query.add_filter('sid', '=', self.uid)
+        result = list(query.fetch())
+        return True if len(result) == 1 else False
 
     def is_teacher(self):
         ds = self.get_client()
-        query = 'select * from teachers where tid = %s' % self.uid
-        result = self.db.execute(query)
-        return True if result.rowcount == 1 else False
+        query = ds.query(kind='teacher')
+        query.add_filter('tid', '=', self.uid)
+        result = list(query.fetch())
+        return True if len(result) == 1 else False
