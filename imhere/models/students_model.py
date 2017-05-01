@@ -4,8 +4,7 @@ from datetime import datetime, date
 
 class Students(Model):
 
-    def __init__(self, dbconn, sid):
-        Model.__init__(self, dbconn)
+    def __init__(self, sid):
         self.sid = sid
 
     def get_uni(self):

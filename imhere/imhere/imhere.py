@@ -12,7 +12,8 @@ import sqlalchemy
 
 from flask import Flask, render_template, request, g
 from models import users_model, index_model, teachers_model, students_model, \
-        courses_model
+        courses_model, model
+from google.cloud import datastore
 
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
@@ -268,22 +269,28 @@ def view_class():
 def register():
     if request.method == 'GET':
         return render_template(
-                'register.html'#,
-                # name=flask.session['google_user']['name'],
+                'register.html',
+                name=flask.session['google_user']['name']
                 # is_student=flask.session['is_student'],
                 # is_teacher=flask.session['is_teacher']
         )
 
     elif request.method == 'POST':
+        ds = model.get_client()
         if request.form['type'] == 'student':
             # check that uni doesn't already exist
             # if it doesn't, continue student creation
-            um = users_model.Users(g.conn)
+            um = users_model.Users()
             if not um.is_valid_uni(request.form['uni']):
-                query = '''
-                insert into students (sid, uni) values({0}, '{1}')
-                '''.format(flask.session['id'], request.form['uni'])
-                g.conn.execute(query)
+                key = ds.key('student')
+                entity = datastore.Entity(
+                    key=key)
+                entity.update({
+                    'sid': flask.session['id'],
+                    'uni': request.form['uni']
+                })
+                ds.put(entity)
+
                 flask.session['is_student'] = True
                 return flask.redirect(flask.url_for('main_student'))
             else:
@@ -294,10 +301,13 @@ def register():
 
         else:
             try:
-                query = '''
-                insert into teachers (tid) values({0})
-                '''.format(flask.session['id'])
-                g.conn.execute(query)
+                key = ds.key('teacher')
+                entity = datastore.Entity(
+                    key=key)
+                entity.update({
+                    'tid': flask.session['id']
+                })
+                ds.put(entity)
                 flask.session['is_teacher'] = True
             except:
                 pass
@@ -333,7 +343,7 @@ def oauth2callback():
         flask.session['google_user'] = user
         flask.session['id'] = um.get_or_create_user(user)
 
-        # now add is_student and is_teacher to flask.session
+        # now add is_student and is_teacher to flask.session TODO fix this part for datastore
         # im = index_model.Index(flask.session['id'])
         # flask.session['is_student'] = True if im.is_student() else False
         # flask.session['is_teacher'] = True if im.is_teacher() else False

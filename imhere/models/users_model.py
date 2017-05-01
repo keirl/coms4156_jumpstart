@@ -26,8 +26,9 @@ class Users(Model):
         return result[0]['id']
 
 
-    def is_valid_uni(self, uni): # TODO convert to datastore
-        uni = self.escape_string(uni)
-        query = "select sid from students where uni = '%s'" % uni
-        result = self.db.execute(query)
+    def is_valid_uni(self, uni): # TODO verify functionality
+        ds = self.get_client()
+        query = ds.query(kind='student')
+        query.add_filter('uni', '=', uni)
+        result = list(query.fetch())
         return True if result.rowcount == 1 else False
