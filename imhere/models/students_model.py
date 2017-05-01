@@ -20,8 +20,8 @@ class Students(Model):
         result = list()
         for enrolledCourse in enrolledCourses:
             query = ds.query(kind='courses')
-            query.add_filter('cid', '=', enrolledCourse.cid)
-            result.append(query.fetch())
+            query.add_filter('cid', '=', enrolledCourse['cid'])
+            result = result + list(query.fetch())
 
         return result
 

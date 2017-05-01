@@ -106,23 +106,20 @@ def login():
 
     im = index_model.Index(flask.session['id'])
     if im.is_student():
-        print "i'm a student!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         print flask.url_for('main_student')
         return flask.redirect(flask.url_for('main_student'))
     elif im.is_teacher():
         return flask.redirect(flask.url_for('main_teacher'))
     else:
-        print "i'm NOOOOT a student!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
         return render_template('login.html', not_registered=True)
 
 
 @app.route('/student/', methods=['GET', 'POST'])
 def main_student():
-    print "yes i'm a student???????????"
     sm = students_model.Students(flask.session['id'])
     courses = sm.get_courses()
     context = dict(data=courses)
-
+    print "here is som context!!!!!!!!! " + str(context)
     signed_in = True if sm.has_signed_in() else False
 
     if request.method == 'GET':
@@ -151,7 +148,7 @@ def main_student():
 
 @app.route('/teacher/', methods=['GET', 'POST'])
 def main_teacher():
-    tm = teachers_model.Teachers(g.conn, flask.session['id'])
+    tm = teachers_model.Teachers(flask.session['id'])
 
     if request.method == 'POST':
         cm = courses_model.Courses(g.conn)
@@ -173,14 +170,14 @@ def main_teacher():
 
 @app.route('/teacher/add_class', methods=['POST', 'GET'])
 def add_class():
-    tm = teachers_model.Teachers(g.conn, flask.session['id'])
+    tm = teachers_model.Teachers(flask.session['id'])
 
     if request.method == 'GET':
         return render_template('add_class.html')
 
     elif request.method == 'POST':
         # first check that all unis are valid
-        um = users_model.Users(g.conn)
+        um = users_model.Users()
         for uni in request.form['unis'].split('\n'):
             uni = uni.strip('\r')
             # always reads at least one empty line from form
@@ -192,7 +189,8 @@ def add_class():
         # then create course and add students to course
         course_name = request.form['classname']
         cid = tm.add_course(course_name)
-        cm = courses_model.Courses(g.conn, cid)
+        print "does my cid look right?????????????? " + str(cid)
+        cm = courses_model.Courses(cid)
 
         for uni in request.form['unis'].split('\n'):
             uni = uni.strip('\r')
@@ -342,8 +340,9 @@ def oauth2callback():
         userinfo_client = apiclient.discovery.build('oauth2', 'v2', http_auth)
         user = userinfo_client.userinfo().v2().me().get().execute()
 
-        if 'columbia.edu' not in user['email']:
-            return flask.redirect(flask.url_for('bademail'))
+        # TODO only allow columbia.edu emails
+        # if 'columbia.edu' not in user['email']:
+        #     return flask.redirect(flask.url_for('bademail'))
 
         um = users_model.Users()
 

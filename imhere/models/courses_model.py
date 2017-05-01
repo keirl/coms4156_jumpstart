@@ -1,15 +1,15 @@
 from model import Model
 from datetime import datetime, date
 from random import randint
-
+from google.cloud import datastore
 
 class Courses(Model):
 
-    def __init__(self, dbconn, cid=-1):
-        Model.__init__(self, dbconn)
+    def __init__(self, cid=-1):
         self.cid = cid
         self.now = datetime.time(datetime.now())
         self.today = date.today()
+        self.ds = self.get_client()
 
     def get_course_name(self):
         query = 'select name from courses where cid = %s' % self.cid
@@ -26,17 +26,23 @@ class Courses(Model):
         return self.deproxy(result)
 
     def add_student(self, uni):
-        uni = self.escape_string(uni)
-        query = "select sid from students where uni = '%s'" % uni
-        result = self.db.execute(query)
+        # uni = self.escape_string(uni)
+        query = self.ds.query(kind='student')
+        query.add_filter('uni', '=', uni)
+        result = list(query.fetch())
 
-        if result.rowcount == 1:
+        if len(result) == 1:
             # found a student with uni, attempt to add to enrolled_in
-            sid = result.fetchone()[0]
+            sid = result[0]['sid']
             try:
-                query = 'insert into enrolled_in values (%s, %s)' \
-                        % (sid, self.cid)
-                self.db.execute(query)
+                key = self.ds.key('enrolled_in')
+                entity = datastore.Entity(
+                    key=key)
+                entity.update({
+                    'sid': sid,
+                    'cid': self.cid
+                })
+                self.ds.put(entity)
                 return 0
             except:
                 # failed because already in enrolled_in
