@@ -74,10 +74,11 @@ def manage_session():
 
 @app.teardown_request
 def teardown_request(exception):
-    try:
-        g.conn.close()
-    except Exception as e:
-        print e
+    pass
+    # try:
+    #     g.conn.close()
+    # except Exception as e:
+    #     print e
 
 
 @app.route('/switch_type', methods=['POST'])
@@ -119,7 +120,6 @@ def main_student():
     sm = students_model.Students(flask.session['id'])
     courses = sm.get_courses()
     context = dict(data=courses)
-    print "here is som context!!!!!!!!! " + str(context)
     signed_in = True if sm.has_signed_in() else False
 
     if request.method == 'GET':
@@ -164,6 +164,7 @@ def main_teacher():
     courses = tm.get_courses_with_session()
     empty = True if len(courses) == 0 else False
     context = dict(data=courses)
+    print "here is som context!!!!!!!!! " + str(context)
 
     return render_template('main_teacher.html', empty=empty, **context)
 

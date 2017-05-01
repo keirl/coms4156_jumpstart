@@ -6,8 +6,8 @@ class Teachers(Model):
 
     def __init__(self, tid):
         self.tid = tid
-        self.now = datetime.time(datetime.now())
-        self.today = date.today()
+        self.now = datetime.now()
+        self.today = datetime.today()
 
     def get_courses(self):
         query = ('select courses.cid, courses.name '
@@ -25,17 +25,16 @@ class Teachers(Model):
         teaches = list(query.fetch())
         courses = list()
         for teach in teaches:
-            print 'teach!!!!!!!!!!!!!!!!!! ' + str(teach)
             query = ds.query(kind='courses')
             query.add_filter('cid', '=', teach['cid'])
             courses = courses + list(query.fetch())
         result = list()
         for course in courses:
-            print 'course!!!!!!!!!!!!!!!!!! ' + str(course)
+            print "here are some courses!!!!!!!! " + str(course)
             query = ds.query(kind='sessions')
             query.add_filter('cid', '=', course['cid'])
             query.add_filter('expires', '>', self.now)
-            query.add_filter('day', '>=', self.today)
+            # query.add_filter('day', '>=', self.today)
             result = result + list(query.fetch())
 
         return result

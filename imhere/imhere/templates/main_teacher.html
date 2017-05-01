@@ -36,7 +36,7 @@
     {% endif %}
 
     {% for n in data %}
-        {% if n[2] == 1 %}
+        {% if n['active'] == 1 %}
 
             <form method="POST" action="/teacher/view_class">
             <button name="cid" value="{{n[0]}}" class="btn-link"><h4>{{n[1]}}</h4>
@@ -51,13 +51,13 @@
             Secret Code:<br>
             {{n[3]}}<br><br>
 
-        {% elif n[2] == 0 %}
+        {% elif n['active'] == 0 %}
 
             <form method="POST" action="/teacher/view_class">
-            <button name="cid" value="{{n[0]}}" class="btn-link"><h4>{{n[1]}}</h4></button></form>
+            <button name="cid" value="{{n['name']}}" class="btn-link"><h4>{{n[1]}}</h4></button></form>
 
             <form method="POST" action="/teacher/">
-            <button name="open" value="{{n[0]}}">Open Attendance Window
+            <button name="open" value="{{n['name']}}">Open Attendance Window
             </button>
             </form><br><br>
 
