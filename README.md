@@ -65,11 +65,11 @@ Everytime you want to work on your Flask application, you will need to run `sour
 #### Python Dependencies
 Before running or deploying this application, install the dependencies using [pip](http://pip.readthedocs.io/en/stable/):
  
-     `pip install -r requirements.txt`
+    pip install -r requirements.txt
 
 Check that Flask is listed
     
-    `pip list`
+    pip list
 
     appdirs (1.4.3)
     click (6.7)
@@ -159,9 +159,39 @@ Verify that it is deployed by
 We strongly recommend that you browse the App Engine docs to get a feel for what is happening under the hood.
 
 #### Connect Travis to App Engine for Continuous Deployment
-You are going to follow the guide [here](https://docs.travis-ci.com/user/deployment/google-app-engine/), [here](https://cloud.google.com/solutions/continuous-delivery-with-travis-ci), and [here](https://blog.travis-ci.com/2013-01-14-new-client/).
+You are going to follow the guides from [Travis CI](https://docs.travis-ci.com/user/deployment/google-app-engine/) and [Google Cloud](https://cloud.google.com/solutions/continuous-delivery-with-travis-ci).  Information on the Travis CI tool is available [here](https://blog.travis-ci.com/2013-01-14-new-client/). *Note: The approach of 
 
-Assuming you installed Ruby earlier, simply call `sudo gem install travis`
+There are two items that are needed to get Travis to work with Google Cloud, an API key and a secret key.  Neither should go into your repo unencrypted.  
+
+- Assuming you installed Ruby earlier, simply call `sudo gem install travis`
+- Turn on [“Google App Engine Admin API”](https://console.developers.google.com/apis/).  Click on `Enable API` then search for `Google App Engine Admin API`.
+- Go to “Credentials”, click “Add Credential” and “API key” and copy to your clipboard.  Rename `api_key.py.sample` to `api_key.py`.  Within `api_key.py`, change `'YOU-API-KEY'` to the API key from Google Cloud.  *Be sure to keep the quotes around the key*.  **Save to your local Git directory, but do not add to the repo.  This file is part of the default .gitignore, so just don't override the .gitignore**  
+- Go to “Credentials”, click “Add Credential” and “Service account key”, finally click “JSON” to download the your Service Account JSON file.  Rename to `client-secret.json`. **Save to your local Git directory, but do not add to the repo.  This file is part of the default .gitignore, so just don't override the .gitignore**  
+
+- Login to Travis with your GitHub account.
+    
+    travis login --org
+
+- Tar your credentials into a single file:
+
+    tar -czf credentials.tar.gz client-secret.json api_key.py
+
+- Encrypt your credentials in your Git directory.  
+
+    travis encrypt-file credentials.tar.gz
+
+- Switch to the continuous deployment `.travis.yml`
+
+    mv .travis.yml .travis.yml.ci
+    mv .travis.yml.cd .travis.yml
+    
+- Edit `.travis.yml` to set up continuous deployment.  Change 'project: google_cloud_project_id` to the proper name.
+
+- Commit changes to you Git repo.
+
+    git add credentials.tar.gz.enc .travis.yml
+    git commit -m "Added keys for Google App deployment"
+    git push
 
 #### Advanced things to look into...
 You can integrate GitHub into Slack so that you see all commits.  You can do the same with [Travis builds](https://docs.travis-ci.com/user/notifications/#Configuring-slack-notifications).  
@@ -170,4 +200,4 @@ The Google Cloud app is pretty good and allows you to see the console from your 
 
 Use tail to look at App Engine logs: `gcloud app logs tail -s default`.
 
-###Have fun!
+### Have fun! and Don't Break the Build!
