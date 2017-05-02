@@ -81,6 +81,7 @@ class Students(Model):
         query.add_filter('cid', '=', int(cid))
         sessions = list(query.fetch())
         results = list()
+        print "here are the sessions " + str(sessions)
         for session in sessions:
             query = self.ds.query(kind='attendance_records')
             query.add_filter('seid', '=', session['seid'])

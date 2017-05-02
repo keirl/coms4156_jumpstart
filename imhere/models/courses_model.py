@@ -104,28 +104,51 @@ class Courses(Model):
         '''Return the seid of an active session if it exists,
         otherwise return -1.
         '''
-        self.cid = self.escape_string(self.cid)
-        query = ('select seid from sessions '
-                 'where cid = %s '
-                 "and expires > '%s' "
-                 "and day >= '%s'"
-                 % (self.cid, self.now, self.today))
-        result = self.db.execute(query)
-        return result.fetchone()[0] if result.rowcount == 1 else -1
+        # query = ('select seid from sessions '
+        #          'where cid = %s '
+        #          "and expires > '%s' "
+        #          "and day >= '%s'"
+        #          % (self.cid, self.now, self.today))
+        # result = self.db.execute(query)
+        # return result.fetchone()[0] if result.rowcount == 1 else -1
+        # TODO fix expiration
+        query = self.ds.query(kind='sessions')
+        query.add_filter('cid', '=', int(self.cid))
+        sessions = list(query.fetch())
+        print "here are the sessions " + str(sessions)
+        return sessions[0]['seid'] if len(sessions) == 1 else -1
 
     def close_session(self, seid):
         if seid == -1:
             return
 
-        query = ('update sessions '
-                 "set expires = '%s' "
-                 'where seid = %s'
-                 % (self.now, seid))
-        self.db.execute(query)
+        # query = ('update sessions '
+        #          "set expires = '%s' "
+        #          'where seid = %s'
+        #          % (self.now, seid))
+        # self.db.execute(query)
 
-        self.cid = self.escape_string(self.cid)
-        query = 'update courses set active = 0 where cid = %s' % self.cid
-        self.db.execute(query)
+        query = self.ds.query(kind='sessions')
+        query.add_filter('seid', '=', int(seid))
+        entity = list(query.fetch())[0]
+        entity.update({
+            'expires': datetime.now()
+        })
+        self.ds.put(entity)
+
+        # TODO fix expiration
+
+        # query = 'update courses set active = 0 where cid = %s' % self.cid
+        # self.db.execute(query)
+
+        query = self.ds.query(kind='courses')
+        query.add_filter('cid', '=', int(self.cid))
+        entity = list(query.fetch())[0]
+        entity.update({
+            'active': 0
+        })
+        self.ds.put(entity)
+
 
     def open_session(self):
         '''Opens a session for this course
@@ -146,6 +169,11 @@ class Courses(Model):
             'secret': int(randsecret),
             'expires': datetime.now() + timedelta(days=1)
             # 'day': self.today
+        })
+        self.ds.put(entity)
+        seid = entity.key.id
+        entity.update({
+            'seid': seid
         })
         self.ds.put(entity)
         query = self.ds.query(kind='sessions')

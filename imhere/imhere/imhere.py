@@ -132,7 +132,8 @@ def main_student():
         if 'secret_code' in request.form.keys():
             provided_secret = request.form['secret_code']
             actual_secret, seid = sm.get_secret_and_seid()
-
+            print "actual secret " + str(actual_secret)
+            print "given secret " + str(provided_secret)
             if provided_secret == actual_secret:
                 sm.insert_attendance_record(seid)
                 valid = True
