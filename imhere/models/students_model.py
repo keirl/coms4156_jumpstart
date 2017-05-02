@@ -1,25 +1,26 @@
 from model import Model
 from datetime import datetime, date
-
+from google.cloud import datastore
 
 class Students(Model):
 
     def __init__(self, sid):
         self.sid = sid
+        self.ds = self.get_client()
 
     def get_uni(self):
-        query = 'select uni from students where sid = %s' % self.sid
-        result = self.db.execute(query)
-        return result.fetchone()[0]
+        query = self.ds.query(kind='student')
+        query.add_filter('sid', '=', self.sid)
+        result = list(query.fetch())
+        return result[0]['uni']
 
     def get_courses(self):
-        ds = self.get_client()
-        query = ds.query(kind='enrolled_in')
+        query = self.ds.query(kind='enrolled_in')
         query.add_filter('sid', '=', self.sid)
         enrolledCourses = list(query.fetch())
         result = list()
         for enrolledCourse in enrolledCourses:
-            query = ds.query(kind='courses')
+            query = self.ds.query(kind='courses')
             query.add_filter('cid', '=', enrolledCourse['cid'])
             result = result + list(query.fetch())
 
@@ -67,11 +68,22 @@ class Students(Model):
         self.db.execute(query)
 
     def get_num_attendance_records(self, cid):
-        query = ('select * '
-                 'from attendance_records, sessions '
-                 'where attendance_records.seid = sessions.seid '
-                 'and sessions.cid = %s '
-                 'and attendance_records.sid = %s'
-                 % (cid, self.sid))
-        result = self.db.execute(query)
-        return result.rowcount
+        # query = ('select * '
+        #          'from attendance_records, sessions '
+        #          'where attendance_records.seid = sessions.seid '
+        #          'and sessions.cid = %s '
+        #          'and attendance_records.sid = %s'
+        #          % (cid, self.sid))
+        # result = self.db.execute(query)
+        # return result.rowcount
+
+        query = self.ds.query(kind='sessions')
+        query.add_filter('cid', '=', int(cid))
+        sessions = list(query.fetch())
+        results = list()
+        for session in sessions:
+            query = self.ds.query(kind='attendance_records')
+            query.add_filter('seid', '=', session['seid'])
+            query.add_filter('sid', '=', self.sid)
+            results = results + list(query.fetch())
+        return len(results)

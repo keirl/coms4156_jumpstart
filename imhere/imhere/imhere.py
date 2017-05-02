@@ -151,7 +151,7 @@ def main_teacher():
     tm = teachers_model.Teachers(flask.session['id'])
 
     if request.method == 'POST':
-        cm = courses_model.Courses(g.conn)
+        cm = courses_model.Courses()
         if "close" in request.form.keys():
             cid = request.form["close"]
             cm.cid = cid
@@ -221,7 +221,7 @@ def view_class():
         flask.redirect(flask.url_for('main_teacher'))
 
     elif request.method == 'POST':
-        cm = courses_model.Courses(g.conn)
+        cm = courses_model.Courses()
 
         if 'close' in request.form.keys():
             cid = request.form['close']
@@ -250,7 +250,7 @@ def view_class():
         students = cm.get_students()
         students_with_ar = []
         for student in students:
-            sm = students_model.Students(g.conn, student[0])
+            sm = students_model.Students(student['id'])
             student_uni = sm.get_uni()
             num_ar = sm.get_num_attendance_records(cid)
             students_with_ar.append([student, student_uni, num_ar])

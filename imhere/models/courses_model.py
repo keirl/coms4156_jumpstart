@@ -12,18 +12,21 @@ class Courses(Model):
         self.ds = self.get_client()
 
     def get_course_name(self):
-        query = 'select name from courses where cid = %s' % self.cid
-        result = self.db.execute(query)
-        return result.fetchone()[0]
+        query = self.ds.query(kind='courses')
+        query.add_filter('cid', '=', int(self.cid))
+        result = list(query.fetch())
+        return result[0]['name']
 
     def get_students(self):
-        query = ('select uid, name, family_name, email '
-                 'from users, enrolled_in '
-                 'where users.uid = enrolled_in.sid '
-                 'and enrolled_in.cid = %s'
-                 % self.cid)
-        result = self.db.execute(query)
-        return self.deproxy(result)
+        query = self.ds.query(kind='enrolled_in')
+        query.add_filter('cid', '=', int(self.cid))
+        enrolledIn = list(query.fetch())
+        results = list()
+        for enrolled in enrolledIn:
+            query = self.ds.query(kind='user')
+            query.add_filter('id', '=', enrolled['sid'])
+            results = results + list(query.fetch())
+        return results
 
     def add_student(self, uni):
         # uni = self.escape_string(uni)
@@ -128,18 +131,21 @@ class Courses(Model):
         return randsecret
 
     def get_secret_code(self):
-        query = ('select secret '
-                 'from sessions, courses '
-                 'where sessions.cid = courses.cid '
-                 'and courses.cid = %s '
-                 'and courses.active = 1 '
-                 "and sessions.expires > '%s' "
-                 "and sessions.day >= '%s'"
-                 % (self.cid, self.now, self.today))
-        result = self.db.execute(query)
-        return int(result.fetchone()[0]) if result.rowcount == 1 else None
+        query = self.ds.query(kind='courses')
+        query.add_filter('cid', '=', int(self.cid))
+        courses = list(query.fetch())
+        results = list()
+        for course in courses:
+            query = self.ds.query(kind='sessions')
+            query.add_filter('cid', '=', course['cid'])
+            # TODO datastore fix sessions
+            # query.add_filter('expires', '>', self.now)
+            # query.add_filter('day', '>=', self.today)
+            results = results + list(query.fetch())
+        return results[0] if len(results) == 1 else None
 
     def get_num_sessions(self):
-        query = 'select * from sessions where cid = %s' % self.cid
-        result = self.db.execute(query)
-        return result.rowcount
+        query = self.ds.query(kind='sessions')
+        query.add_filter('cid', '=', int(self.cid))
+        results = list(query.fetch())
+        return len(results)

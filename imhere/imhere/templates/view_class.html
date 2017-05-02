@@ -89,8 +89,8 @@
     <!-- students is a list == [<RowProxy>, UNI, num_attendance_records] -->
     {% for student in students %}
     <tr>
-        <td align="center">{{student[0][1]}} {{student[0][2]}}</td>
-        <td align="center">{{student[0][3]}}</td>
+        <td align="center">{{student[0]['name']}}</td>
+        <td align="center">{{student[0]['email']}}</td>
         <td align="center">{{student[1]}}</td>
         <td align="center">{{student[2]}}/{{num_sessions}}</td>
     </tr>
