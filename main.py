@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    return 'Hello COMS4156!'
+    return 'Hello COMS4156! CD works!'
 
 # @app.route('/form')
 # def form():
