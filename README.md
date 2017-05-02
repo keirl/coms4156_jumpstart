@@ -165,7 +165,7 @@ There are two items that are needed to get Travis to work with Google Cloud, an 
 
 - Assuming you installed Ruby earlier, simply call `sudo gem install travis`
 - Turn on [“Google App Engine Admin API”](https://console.developers.google.com/apis/).  Click on `Enable API` then search for `Google App Engine Admin API`.
-- Go to “Credentials”, click “Add Credential” and “API key” and copy to your clipboard.  Rename `api_key.py.sample` to `api_key.py`.  Within `api_key.py`, change `'YOU-API-KEY'` to the API key from Google Cloud.  *Be sure to keep the quotes around the key*.  **Save to your local Git directory, but do not add to the repo.  This file is part of the default .gitignore, so just don't override the .gitignore**  
+- Go to “Credentials”, click “Add Credential” and “API key” and copy to your clipboard.  Restrict the API key to an HTTP referrer `www.travis-ci.org`. (This keeps people from hijacking your website.) Rename `api_key.py.sample` to `api_key.py`.  Within `api_key.py`, change `'YOU-API-KEY'` to the API key from Google Cloud.  *Be sure to keep the quotes around the key*.  **Save to your local Git directory, but do not add to the repo.  This file is part of the default .gitignore, so just don't override the .gitignore**  
 - Go to “Credentials”, click “Add Credential” and “Service account key”, finally click “JSON” to download the your Service Account JSON file.  Rename to `client-secret.json`. **Save to your local Git directory, but do not add to the repo.  This file is part of the default .gitignore, so just don't override the .gitignore**  
 
 - Login to Travis with your GitHub account.
