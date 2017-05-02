@@ -29,7 +29,6 @@ class Courses(Model):
         return results
 
     def add_student(self, uni):
-        # uni = self.escape_string(uni)
         query = self.ds.query(kind='student')
         query.add_filter('uni', '=', uni)
         result = list(query.fetch())
@@ -37,19 +36,28 @@ class Courses(Model):
         if len(result) == 1:
             # found a student with uni, attempt to add to enrolled_in
             sid = result[0]['sid']
-            try:
-                key = self.ds.key('enrolled_in')
-                entity = datastore.Entity(
-                    key=key)
-                entity.update({
-                    'sid': sid,
-                    'cid': self.cid
-                })
-                self.ds.put(entity)
-                return 0
-            except:
+            query = self.ds.query(kind='enrolled_in')
+            query.add_filter('sid', '=', sid)
+            query.add_filter('cid', '=', int(self.cid))
+            result = list(query.fetch())
+            print "enrolled " + str(result)
+            if len(result) > 0:
                 # failed because already in enrolled_in
                 return -2
+
+            key = self.ds.key('enrolled_in')
+            entity = datastore.Entity(
+                key=key)
+            entity.update({
+                'sid': sid,
+                'cid': int(self.cid)
+            })
+            self.ds.put(entity)
+            query = self.ds.query(kind='enrolled_in')
+            teaches = list(query.fetch())
+            print teaches
+            return 0
+
         else:
             # invalid uni
             return -1
@@ -68,14 +76,12 @@ class Courses(Model):
             query.add_filter('cid', '=', int(self.cid))
             result = list(query.fetch())
 
-            if len(result) == 1:
+            if len(result) > 0:
 
-                print "here is the entity i'm deleting " + str(result[0])
-                print "here is the key " + str(result[0].key)
                 self.ds.delete(result[0].key)
 
                 query = self.ds.query(kind='sessions')
-                query.add_filter('cid', '=', self.cid)
+                query.add_filter('cid', '=', int(self.cid))
                 sessions = list(query.fetch())
                 print sessions
                 attendanceRecords = list()
