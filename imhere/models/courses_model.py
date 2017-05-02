@@ -1,5 +1,5 @@
 from model import Model
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from random import randint
 from google.cloud import datastore
 
@@ -133,14 +133,42 @@ class Courses(Model):
         '''
         # auto-generated secret code for now
         randsecret = randint(1000, 9999)
-        self.cid = self.escape_string(self.cid)
-        query = ('insert into sessions (cid, secret, expires, day) '
-                 "values (%s, '%d', '%s', '%s')"
-                 % (self.cid, randsecret, '23:59:59', self.today))
-        self.db.execute(query)
+        # query = ('insert into sessions (cid, secret, expires, day) '
+        #          "values (%s, '%d', '%s', '%s')"
+        #          % (self.cid, randsecret, '23:59:59', self.today))
+        # self.db.execute(query)
 
-        query = 'update courses set active = 1 where cid = %s' % self.cid
-        self.db.execute(query)
+        key = self.ds.key('sessions')
+        entity = datastore.Entity(
+            key=key)
+        entity.update({
+            'cid': int(self.cid),
+            'secret': int(randsecret),
+            'expires': datetime.now() + timedelta(days=1)
+            # 'day': self.today
+        })
+        self.ds.put(entity)
+        query = self.ds.query(kind='sessions')
+        sessions = list(query.fetch())
+        print "here are the sessions!!!!!!!!!!! " + str(sessions)
+
+        # query = 'update courses set active = 1 where cid = %s' % self.cid
+        # self.db.execute(query)
+        print "here is the cid being updated " + str(self.cid)
+        key = self.ds.key('courses', int(self.cid))
+        results = self.ds.get(key)
+        entity = datastore.Entity(
+            key=key)
+        entity.update({
+            'name': results['name'],
+            'active': 1,
+            'cid': results['cid']
+        })
+        self.ds.put(entity)
+        query = self.ds.query(kind='courses')
+        teaches = list(query.fetch())
+        print "here are the courses !!!!!!!!!!!!!! " + str(teaches)
+
         return randsecret
 
     def get_secret_code(self):

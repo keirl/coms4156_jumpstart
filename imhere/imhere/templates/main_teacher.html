@@ -39,17 +39,17 @@
         {% if n['active'] == 1 %}
 
             <form method="POST" action="/teacher/view_class">
-            <button name="cid" value="{{n[0]}}" class="btn-link"><h4>{{n[1]}}</h4>
+            <button name="cid" value="{{n['cid']}}" class="btn-link"><h4>{{n['name']}}</h4>
             </button>
             </form>
 
             <form method="POST" action="/teacher/">
-            <button name="close" value="{{n[0]}}">Close Attendance Window
+            <button name="close" value="{{n['cid']}}">Close Attendance Window
             </button>
             </form><br>
 
             Secret Code:<br>
-            {{n[3]}}<br><br>
+            {{n['secret']}}<br><br>
 
         {% elif n['active'] == 0 %}
 
@@ -57,7 +57,7 @@
             <button name="cid" value="{{n['cid']}}" class="btn-link"><h4>{{n['name']}}</h4></button></form>
 
             <form method="POST" action="/teacher/">
-            <button name="open" value="{{n['name']}}">Open Attendance Window
+            <button name="open" value="{{n['cid']}}">Open Attendance Window
             </button>
             </form><br><br>
 
