@@ -193,6 +193,8 @@ There are two items that are needed to get Travis to work with Google Cloud, an 
     git commit -m "Added keys for Google App deployment"
     git push
 
+- Verify that everything is working as expected.  Look at the Travis CI log, make a small change to the application and make sure it ended up there.
+
 #### Advanced things to look into...
 You can integrate GitHub into Slack so that you see all commits.  You can do the same with [Travis builds](https://docs.travis-ci.com/user/notifications/#Configuring-slack-notifications).  
 
