@@ -164,7 +164,6 @@ def main_teacher():
     courses = tm.get_courses_with_session()
     empty = True if len(courses) == 0 else False
     context = dict(data=courses)
-    print "here is som context!!!!!!!!! " + str(context)
 
     return render_template('main_teacher.html', empty=empty, **context)
 
@@ -190,7 +189,6 @@ def add_class():
         # then create course and add students to course
         course_name = request.form['classname']
         cid = tm.add_course(course_name)
-        print "does my cid look right?????????????? " + str(cid)
         cm = courses_model.Courses(cid)
 
         for uni in request.form['unis'].split('\n'):
@@ -202,7 +200,7 @@ def add_class():
 
 @app.route('/teacher/remove_class', methods=['POST', 'GET'])
 def remove_class():
-    tm = teachers_model.Teachers(g.conn, flask.session['id'])
+    tm = teachers_model.Teachers(flask.session['id'])
 
     # show potential courses to remove on get request
     if request.method == 'GET':

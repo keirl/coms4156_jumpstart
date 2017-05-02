@@ -18,8 +18,6 @@ class Users(Model):
                     key=key)
                 entity.update(user)
                 ds.put(entity)
-                # key2 = ds.key('user', int('5715999101812736'))
-                # ds.delete(key2)
             except:  # TODO
                 pass
         result = list(query.fetch())

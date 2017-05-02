@@ -15,11 +15,11 @@
 
         {% for n in data %}
         <tr>
-            <td>{{n[1]}}</td>
+            <td>{{n['name']}}</td>
             <td>|</td>
             <td>
                 <form method="POST" action="/teacher/remove_class">
-                    <button name="cid" value="{{n[0]}}">Remove Class
+                    <button name="cid" value="{{n['cid']}}">Remove Class
                     </button>
                 </form>
             </td>

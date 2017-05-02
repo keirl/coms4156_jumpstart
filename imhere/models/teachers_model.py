@@ -8,65 +8,66 @@ class Teachers(Model):
         self.tid = tid
         self.now = datetime.now()
         self.today = datetime.today()
+        self.ds = self.get_client()
 
     def get_courses(self):
-        query = ('select courses.cid, courses.name '
-                 'from courses, teaches '
-                 'where courses.cid = teaches.cid '
-                 'and teaches.tid = %s'
-                 % self.tid)
-        result = self.db.execute(query)
-        return self.deproxy(result)
+        query = self.ds.query(kind='teaches')
+        query.add_filter('tid', '=', self.tid)
+        teaches = list(query.fetch())
+        results = list()
+        for teach in teaches:
+            query = self.ds.query(kind='courses')
+            query.add_filter('cid', '=', teach['cid'])
+            results = results + list(query.fetch())
+        return results
 
     def get_courses_with_session(self):
-        ds = self.get_client()
-        query = ds.query(kind='teaches')
+        query = self.ds.query(kind='teaches')
         query.add_filter('tid', '=', self.tid)
         teaches = list(query.fetch())
         courses = list()
         for teach in teaches:
-            query = ds.query(kind='courses')
+            query = self.ds.query(kind='courses')
             query.add_filter('cid', '=', teach['cid'])
             courses = courses + list(query.fetch())
-        result = list()
+        sessions = list()
         for course in courses:
-            print "here are some courses!!!!!!!! " + str(course)
-            query = ds.query(kind='sessions')
+            query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', course['cid'])
-            query.add_filter('expires', '>', self.now)
+            # TODO datastore fix sessions
+            # query.add_filter('expires', '>', self.now)
             # query.add_filter('day', '>=', self.today)
-            result = result + list(query.fetch())
+            sessions = sessions + list(query.fetch())
 
+        result = courses + sessions
         return result
 
 
     def add_course(self, course_name):
-        ds = self.get_client()
-        key = ds.key('courses')
+        key = self.ds.key('courses')
         entity = datastore.Entity(
             key=key)
         entity.update({
             'name': course_name,
             'active': 0
         })
-        ds.put(entity)
+        self.ds.put(entity)
         cid = entity.key.id
         entity.update({
             'cid': cid
         })
-        ds.put(entity)
+        self.ds.put(entity)
 
-        key = ds.key('teaches')
+        key = self.ds.key('teaches')
         entity = datastore.Entity(
             key=key)
         entity.update({
             'tid': self.tid,
             'cid': cid
         })
-        ds.put(entity)
+        self.ds.put(entity)
         return cid
 
     def remove_course(self, cid):
-        cid = self.escape_string(cid)
-        query = 'delete from courses where cid = %s' % cid
-        self.db.execute(query)
+        key = self.ds.key('courses', int(cid))
+        self.ds.delete(key)

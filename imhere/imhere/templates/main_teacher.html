@@ -54,7 +54,7 @@
         {% elif n['active'] == 0 %}
 
             <form method="POST" action="/teacher/view_class">
-            <button name="cid" value="{{n['name']}}" class="btn-link"><h4>{{n[1]}}</h4></button></form>
+            <button name="cid" value="{{n['cid']}}" class="btn-link"><h4>{{n['name']}}</h4></button></form>
 
             <form method="POST" action="/teacher/">
             <button name="open" value="{{n['name']}}">Open Attendance Window
