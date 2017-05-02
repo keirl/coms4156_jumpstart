@@ -55,30 +55,37 @@ class Courses(Model):
             return -1
 
     def remove_student(self, uni):
-        uni = self.escape_string(uni)
-        query = "select sid from students where uni = '%s'" % uni
-        result = self.db.execute(query)
+        query = self.ds.query(kind='student')
+        query.add_filter('uni', '=', uni)
+        result = list(query.fetch())
 
-        if result.rowcount == 1:
+        if len(result) == 1:
             # found a student with uni, attempt to remove from enrolled_in
-            sid = result.fetchone()[0]
+            sid = result[0]['sid']
 
-            query = ('select * from enrolled_in '
-                     'where sid = %s and cid = %s'
-                     % (sid, self.cid))
-            result = self.db.execute(query)
+            query = self.ds.query(kind='enrolled_in')
+            query.add_filter('sid', '=', sid)
+            query.add_filter('cid', '=', int(self.cid))
+            result = list(query.fetch())
 
-            if result.rowcount == 1:
-                query = 'delete from enrolled_in where sid = %s and cid = %s' \
-                        % (sid, self.cid)
-                self.db.execute(query)
+            if len(result) == 1:
 
-                query = ('delete from attendance_records using sessions '
-                         'where attendance_records.seid = sessions.seid '
-                         'and attendance_records.sid = %s '
-                         'and sessions.cid = %s'
-                         % (sid, self.cid))
-                self.db.execute(query)
+                print "here is the entity i'm deleting " + str(result[0])
+                print "here is the key " + str(result[0].key)
+                self.ds.delete(result[0].key)
+
+                query = self.ds.query(kind='sessions')
+                query.add_filter('cid', '=', self.cid)
+                sessions = list(query.fetch())
+                print sessions
+                attendanceRecords = list()
+                for session in sessions:
+                    query = self.ds.query(kind='attendance_records')
+                    query.add_filter('seid', '=', int(session['seid']))
+                    attendanceRecords = attendanceRecords + list(query.fetch())
+                print attendanceRecords
+                for attendanceRecord in attendanceRecords:
+                    self.ds.delete(attendanceRecord.key)
                 return 0
             else:
                 # failed because it was not in enrolled_in to begin with
