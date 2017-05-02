@@ -30,21 +30,39 @@ class Students(Model):
         now = datetime.time(datetime.now())
         today = date.today()
 
-        try:
-            query = ('select secret, seid '
-                     'from sessions, enrolled_in '
-                     'where enrolled_in.sid = %s '
-                     'and enrolled_in.cid = sessions.cid '
-                     "and sessions.expires > '%s' "
-                     "and sessions.day >= '%s'"
-                     % (self.sid, now, today))
-            result = self.db.execute(query)
-            row = result.fetchone()
-            secret = row[0]
-            seid = row[1]
-        except:
-            secret, seid = None, -1
+        # try:
+        #     query = ('select secret, seid '
+        #              'from sessions, enrolled_in '
+        #              'where enrolled_in.sid = %s '
+        #              'and enrolled_in.cid = sessions.cid '
+        #              "and sessions.expires > '%s' "
+        #              "and sessions.day >= '%s'"
+        #              % (self.sid, now, today))
+        #     result = self.db.execute(query)
+        #     row = result.fetchone()
+        #     secret = row[0]
+        #     seid = row[1]
+        # except:
+        #     secret, seid = None, -1
+        #
+        # return secret, seid
 
+        query = self.ds.query(kind='enrolled_in')
+        enrolledIn = list(query.fetch())
+        results = list()
+        for enrolled in enrolledIn:
+            query = self.ds.query(kind='sessions')
+            query.add_filter('cid', '=', enrolled['cid'])
+            # TODO datastore fix sessions
+            # query.add_filter('expires', '>', self.now)
+            # query.add_filter('day', '>=', self.today)
+            results = results + list(query.fetch())
+        print "here are the results: " + str(results)
+        if len(results) == 1:
+            secret = results[0]['secret']
+            seid = results[0]['seid']
+        else:
+            secret, seid = None, -1
         return secret, seid
 
     def has_signed_in(self):
