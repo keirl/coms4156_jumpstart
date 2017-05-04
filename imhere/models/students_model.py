@@ -57,7 +57,6 @@ class Students(Model):
             # query.add_filter('expires', '>', self.now)
             # query.add_filter('day', '>=', self.today)
             results = results + list(query.fetch())
-        print "here are the results: " + str(results)
         if len(results) == 1:
             secret = results[0]['secret']
             seid = results[0]['seid']
@@ -71,35 +70,32 @@ class Students(Model):
         if seid == -1:
             return False
         else:
-
-            query = ('select * from attendance_records, sessions '
-                     'where attendance_records.seid = sessions.seid '
-                     'and attendance_records.sid = %s '
-                     'and sessions.seid = %s'
-                     % (self.sid, seid))
-            result = self.db.execute(query)
-            return True if result.rowcount == 1 else False
+            query = self.ds.query(kind='sessions')
+            query.add_filter('seid', '=', int(seid))
+            sessions = list(query.fetch())
+            results = list()
+            for session in sessions:
+                query = self.ds.query(kind='attendance_records')
+                query.add_filter('seid', '=', int(session['seid']))
+                query.add_filter('sid', '=', self.sid)
+                results = results + list(query.fetch())
+            return True if len(results) == 1 else False
 
     def insert_attendance_record(self, seid):
-        query = 'insert into attendance_records values (%s, %s)' \
-                % (self.sid, seid)
-        self.db.execute(query)
+        key = self.ds.key('attendance_records')
+        entity = datastore.Entity(
+            key=key)
+        entity.update({
+            'sid': self.sid,
+            'seid': int(seid)
+        })
+        self.ds.put(entity)
 
     def get_num_attendance_records(self, cid):
-        # query = ('select * '
-        #          'from attendance_records, sessions '
-        #          'where attendance_records.seid = sessions.seid '
-        #          'and sessions.cid = %s '
-        #          'and attendance_records.sid = %s'
-        #          % (cid, self.sid))
-        # result = self.db.execute(query)
-        # return result.rowcount
-
         query = self.ds.query(kind='sessions')
         query.add_filter('cid', '=', int(cid))
         sessions = list(query.fetch())
         results = list()
-        print "here are the sessions " + str(sessions)
         for session in sessions:
             query = self.ds.query(kind='attendance_records')
             query.add_filter('seid', '=', session['seid'])

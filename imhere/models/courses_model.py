@@ -40,7 +40,6 @@ class Courses(Model):
             query.add_filter('sid', '=', sid)
             query.add_filter('cid', '=', int(self.cid))
             result = list(query.fetch())
-            print "enrolled " + str(result)
             if len(result) > 0:
                 # failed because already in enrolled_in
                 return -2
@@ -53,9 +52,6 @@ class Courses(Model):
                 'cid': int(self.cid)
             })
             self.ds.put(entity)
-            query = self.ds.query(kind='enrolled_in')
-            teaches = list(query.fetch())
-            print teaches
             return 0
 
         else:
@@ -83,13 +79,11 @@ class Courses(Model):
                 query = self.ds.query(kind='sessions')
                 query.add_filter('cid', '=', int(self.cid))
                 sessions = list(query.fetch())
-                print sessions
                 attendanceRecords = list()
                 for session in sessions:
                     query = self.ds.query(kind='attendance_records')
                     query.add_filter('seid', '=', int(session['seid']))
                     attendanceRecords = attendanceRecords + list(query.fetch())
-                print attendanceRecords
                 for attendanceRecord in attendanceRecords:
                     self.ds.delete(attendanceRecord.key)
                 return 0
@@ -115,7 +109,6 @@ class Courses(Model):
         query = self.ds.query(kind='sessions')
         query.add_filter('cid', '=', int(self.cid))
         sessions = list(query.fetch())
-        print "here are the sessions " + str(sessions)
         return sessions[0]['seid'] if len(sessions) == 1 else -1
 
     def close_session(self, seid):
@@ -176,13 +169,7 @@ class Courses(Model):
             'seid': seid
         })
         self.ds.put(entity)
-        query = self.ds.query(kind='sessions')
-        sessions = list(query.fetch())
-        print "here are the sessions!!!!!!!!!!! " + str(sessions)
 
-        # query = 'update courses set active = 1 where cid = %s' % self.cid
-        # self.db.execute(query)
-        print "here is the cid being updated " + str(self.cid)
         key = self.ds.key('courses', int(self.cid))
         results = self.ds.get(key)
         entity = datastore.Entity(
@@ -193,9 +180,6 @@ class Courses(Model):
             'cid': results['cid']
         })
         self.ds.put(entity)
-        query = self.ds.query(kind='courses')
-        teaches = list(query.fetch())
-        print "here are the courses !!!!!!!!!!!!!! " + str(teaches)
 
         return randsecret
 
@@ -211,7 +195,7 @@ class Courses(Model):
             # query.add_filter('expires', '>', self.now)
             # query.add_filter('day', '>=', self.today)
             results = results + list(query.fetch())
-        return results[0] if len(results) == 1 else None
+        return results[0]['secret'] if len(results) == 1 else None
 
     def get_num_sessions(self):
         query = self.ds.query(kind='sessions')
