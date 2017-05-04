@@ -23,6 +23,9 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+imhere/env/
+imhere/lib/
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -89,4 +92,11 @@ ENV/
 .ropeproject
 
 # imhere client secrets
-./imhere/client_secrets.json
+imhere/client_secrets.json
+imhere/cred.json
+credentials.tar.gz
+imhere/client_secrets_oauth.json
+
+# Backup files
+*.*~
+*/*.*~

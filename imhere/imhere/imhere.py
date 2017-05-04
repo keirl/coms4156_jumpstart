@@ -322,7 +322,7 @@ def register():
 @app.route('/oauth/callback')
 def oauth2callback():
     flow = oauth2client.client.flow_from_clientsecrets(
-        'client_secrets.json',
+        'client_secrets_oauth.json',
         scope=[
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile'],
