@@ -19,18 +19,11 @@ from google.cloud import datastore
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
-engine = sqlalchemy.create_engine('postgres://ricardo:martinez@localhost/imhere')
 
 
 @app.before_request
 def before_request():
-    # try:
-    #     g.conn = engine.connect()
-    # except:
-    #     print 'uh oh, problem connecting to database'
-    #     import traceback
-    #     traceback.print_exc()
-        g.conn = None
+    pass
 
 
 @app.before_request
@@ -75,15 +68,10 @@ def manage_session():
 @app.teardown_request
 def teardown_request(exception):
     pass
-    # try:
-    #     g.conn.close()
-    # except Exception as e:
-    #     print e
-
 
 @app.route('/switch_type', methods=['POST'])
 def switch_type():
-    im = index_model.Index(g.conn, flask.session['id'])
+    im = index_model.Index(flask.session['id'])
     if request.form['type'] == 'teacher':
         if im.is_teacher():
             return flask.redirect(flask.url_for('main_teacher'))
