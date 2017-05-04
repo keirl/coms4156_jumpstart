@@ -27,26 +27,6 @@ class Students(Model):
         return result
 
     def get_secret_and_seid(self):
-        now = datetime.time(datetime.now())
-        today = date.today()
-
-        # try:
-        #     query = ('select secret, seid '
-        #              'from sessions, enrolled_in '
-        #              'where enrolled_in.sid = %s '
-        #              'and enrolled_in.cid = sessions.cid '
-        #              "and sessions.expires > '%s' "
-        #              "and sessions.day >= '%s'"
-        #              % (self.sid, now, today))
-        #     result = self.db.execute(query)
-        #     row = result.fetchone()
-        #     secret = row[0]
-        #     seid = row[1]
-        # except:
-        #     secret, seid = None, -1
-        #
-        # return secret, seid
-
         query = self.ds.query(kind='enrolled_in')
         enrolledIn = list(query.fetch())
         results = list()
@@ -54,8 +34,7 @@ class Students(Model):
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', enrolled['cid'])
             # TODO datastore fix sessions
-            # query.add_filter('expires', '>', self.now)
-            # query.add_filter('day', '>=', self.today)
+            query.add_filter('expires', '>', datetime.now())
             results = results + list(query.fetch())
         if len(results) == 1:
             secret = results[0]['secret']

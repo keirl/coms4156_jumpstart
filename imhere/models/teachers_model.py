@@ -35,8 +35,7 @@ class Teachers(Model):
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', course['cid'])
             # TODO datastore fix sessions
-            # query.add_filter('expires', '>', self.now)
-            # query.add_filter('day', '>=', self.today)
+            # query.add_filter('expires', '>', datetime.now())
             sessions = list(query.fetch())
             if len(sessions) > 0:
                 course['secret'] = sessions[0]['secret']
