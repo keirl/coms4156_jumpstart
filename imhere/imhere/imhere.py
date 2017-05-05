@@ -12,24 +12,18 @@ import sqlalchemy
 
 from flask import Flask, render_template, request, g
 from models import users_model, index_model, teachers_model, students_model, \
-        courses_model
+        courses_model, model
+from google.cloud import datastore
 
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 
-engine = sqlalchemy.create_engine('postgres://ricardo:martinez@localhost/imhere')
 
 
 @app.before_request
 def before_request():
-    try:
-        g.conn = engine.connect()
-    except:
-        print 'uh oh, problem connecting to database'
-        import traceback
-        traceback.print_exc()
-        g.conn = None
+    pass
 
 
 @app.before_request
@@ -44,6 +38,7 @@ def teacher_session():
 @app.before_request
 def student_session():
     if '/student/' in request.path:
+
         if 'credentials' not in flask.session:
             return flask.redirect(flask.url_for('index'))
         elif not flask.session['is_student']:
@@ -71,15 +66,11 @@ def manage_session():
 
 @app.teardown_request
 def teardown_request(exception):
-    try:
-        g.conn.close()
-    except Exception as e:
-        print e
-
+    pass
 
 @app.route('/switch_type', methods=['POST'])
 def switch_type():
-    im = index_model.Index(g.conn, flask.session['id'])
+    im = index_model.Index(flask.session['id'])
     if request.form['type'] == 'teacher':
         if im.is_teacher():
             return flask.redirect(flask.url_for('main_teacher'))
@@ -101,8 +92,9 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
-    im = index_model.Index(g.conn, flask.session['id'])
+    im = index_model.Index(flask.session['id'])
     if im.is_student():
+        print flask.url_for('main_student')
         return flask.redirect(flask.url_for('main_student'))
     elif im.is_teacher():
         return flask.redirect(flask.url_for('main_teacher'))
@@ -112,10 +104,9 @@ def login():
 
 @app.route('/student/', methods=['GET', 'POST'])
 def main_student():
-    sm = students_model.Students(g.conn, flask.session['id'])
+    sm = students_model.Students(flask.session['id'])
     courses = sm.get_courses()
     context = dict(data=courses)
-
     signed_in = True if sm.has_signed_in() else False
 
     if request.method == 'GET':
@@ -128,8 +119,7 @@ def main_student():
         if 'secret_code' in request.form.keys():
             provided_secret = request.form['secret_code']
             actual_secret, seid = sm.get_secret_and_seid()
-
-            if provided_secret == actual_secret:
+            if int(provided_secret) == int(actual_secret):
                 sm.insert_attendance_record(seid)
                 valid = True
             else:
@@ -144,10 +134,10 @@ def main_student():
 
 @app.route('/teacher/', methods=['GET', 'POST'])
 def main_teacher():
-    tm = teachers_model.Teachers(g.conn, flask.session['id'])
+    tm = teachers_model.Teachers(flask.session['id'])
 
     if request.method == 'POST':
-        cm = courses_model.Courses(g.conn)
+        cm = courses_model.Courses()
         if "close" in request.form.keys():
             cid = request.form["close"]
             cm.cid = cid
@@ -160,20 +150,19 @@ def main_teacher():
     courses = tm.get_courses_with_session()
     empty = True if len(courses) == 0 else False
     context = dict(data=courses)
-
     return render_template('main_teacher.html', empty=empty, **context)
 
 
 @app.route('/teacher/add_class', methods=['POST', 'GET'])
 def add_class():
-    tm = teachers_model.Teachers(g.conn, flask.session['id'])
+    tm = teachers_model.Teachers(flask.session['id'])
 
     if request.method == 'GET':
         return render_template('add_class.html')
 
     elif request.method == 'POST':
         # first check that all unis are valid
-        um = users_model.Users(g.conn)
+        um = users_model.Users()
         for uni in request.form['unis'].split('\n'):
             uni = uni.strip('\r')
             # always reads at least one empty line from form
@@ -185,7 +174,7 @@ def add_class():
         # then create course and add students to course
         course_name = request.form['classname']
         cid = tm.add_course(course_name)
-        cm = courses_model.Courses(g.conn, cid)
+        cm = courses_model.Courses(cid)
 
         for uni in request.form['unis'].split('\n'):
             uni = uni.strip('\r')
@@ -196,7 +185,7 @@ def add_class():
 
 @app.route('/teacher/remove_class', methods=['POST', 'GET'])
 def remove_class():
-    tm = teachers_model.Teachers(g.conn, flask.session['id'])
+    tm = teachers_model.Teachers(flask.session['id'])
 
     # show potential courses to remove on get request
     if request.method == 'GET':
@@ -217,7 +206,7 @@ def view_class():
         flask.redirect(flask.url_for('main_teacher'))
 
     elif request.method == 'POST':
-        cm = courses_model.Courses(g.conn)
+        cm = courses_model.Courses()
 
         if 'close' in request.form.keys():
             cid = request.form['close']
@@ -246,13 +235,12 @@ def view_class():
         students = cm.get_students()
         students_with_ar = []
         for student in students:
-            sm = students_model.Students(g.conn, student[0])
+            sm = students_model.Students(student['id'])
             student_uni = sm.get_uni()
             num_ar = sm.get_num_attendance_records(cid)
             students_with_ar.append([student, student_uni, num_ar])
 
         context = dict(students=students_with_ar)
-
         return render_template(
                 'view_class.html',
                 cid=cid,
@@ -271,18 +259,26 @@ def register():
                 'register.html',
                 name=flask.session['google_user']['name'],
                 is_student=flask.session['is_student'],
-                is_teacher=flask.session['is_teacher'])
+                is_teacher=flask.session['is_teacher']
+        )
 
     elif request.method == 'POST':
+        m = model.Model()
+        ds = m.get_client()
         if request.form['type'] == 'student':
             # check that uni doesn't already exist
             # if it doesn't, continue student creation
-            um = users_model.Users(g.conn)
+            um = users_model.Users()
             if not um.is_valid_uni(request.form['uni']):
-                query = '''
-                insert into students (sid, uni) values({0}, '{1}')
-                '''.format(flask.session['id'], request.form['uni'])
-                g.conn.execute(query)
+                key = ds.key('student')
+                entity = datastore.Entity(
+                    key=key)
+                entity.update({
+                    'sid': flask.session['id'],
+                    'uni': request.form['uni']
+                })
+                ds.put(entity)
+
                 flask.session['is_student'] = True
                 return flask.redirect(flask.url_for('main_student'))
             else:
@@ -293,10 +289,13 @@ def register():
 
         else:
             try:
-                query = '''
-                insert into teachers (tid) values({0})
-                '''.format(flask.session['id'])
-                g.conn.execute(query)
+                key = ds.key('teacher')
+                entity = datastore.Entity(
+                    key=key)
+                entity.update({
+                    'tid': flask.session['id']
+                })
+                ds.put(entity)
                 flask.session['is_teacher'] = True
             except:
                 pass
@@ -306,7 +305,7 @@ def register():
 @app.route('/oauth/callback')
 def oauth2callback():
     flow = oauth2client.client.flow_from_clientsecrets(
-        'client_secrets.json',
+        'client_secrets_oauth.json',
         scope=[
             'https://www.googleapis.com/auth/userinfo.email',
             'https://www.googleapis.com/auth/userinfo.profile'],
@@ -324,16 +323,17 @@ def oauth2callback():
         userinfo_client = apiclient.discovery.build('oauth2', 'v2', http_auth)
         user = userinfo_client.userinfo().v2().me().get().execute()
 
-        if 'columbia.edu' not in user['email']:
-            return flask.redirect(flask.url_for('bademail'))
+        # TODO only allow columbia.edu emails
+        # if 'columbia.edu' not in user['email']:
+        #     return flask.redirect(flask.url_for('bademail'))
 
-        um = users_model.Users(g.conn)
+        um = users_model.Users()
 
         flask.session['google_user'] = user
         flask.session['id'] = um.get_or_create_user(user)
 
         # now add is_student and is_teacher to flask.session
-        im = index_model.Index(g.conn, flask.session['id'])
+        im = index_model.Index(flask.session['id'])
         flask.session['is_student'] = True if im.is_student() else False
         flask.session['is_teacher'] = True if im.is_teacher() else False
 

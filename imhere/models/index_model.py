@@ -3,16 +3,19 @@ from model import Model
 
 class Index(Model):
 
-    def __init__(self, dbconn, uid):
-        Model.__init__(self, dbconn)
+    def __init__(self, uid):
         self.uid = uid
 
     def is_student(self):
-        query = 'select * from students where sid = %s' % self.uid
-        result = self.db.execute(query)
-        return True if result.rowcount == 1 else False
+        ds = self.get_client()
+        query = ds.query(kind='student')
+        query.add_filter('sid', '=', self.uid)
+        result = list(query.fetch())
+        return True if len(result) == 1 else False
 
     def is_teacher(self):
-        query = 'select * from teachers where tid = %s' % self.uid
-        result = self.db.execute(query)
-        return True if result.rowcount == 1 else False
+        ds = self.get_client()
+        query = ds.query(kind='teacher')
+        query.add_filter('tid', '=', self.uid)
+        result = list(query.fetch())
+        return True if len(result) == 1 else False

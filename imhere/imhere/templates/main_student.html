@@ -19,9 +19,9 @@
 
     <!-- first show classes that have an available session -->
     {% for n in data %}
-        {% if n[7] == 1 %}
+        {% if n['active'] == 1 %}
 
-            <h4>{{n[1]}}</h4>
+            <h4>{{n['name']}}</h4>
 
             {% if valid %}
                 Successful sign-in!
@@ -48,9 +48,9 @@
 
     <!-- then show classes that are not ongoing at this time/date -->
     {% for n in data %}
-        {% if n[7] == 0 %}
+        {% if n['active'] == 0 %}
 
-            <h4>{{n[1]}}</h4>
+            <h4>{{n['name']}}</h4>
             No sign-in window available!
             <br>
 
