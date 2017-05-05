@@ -31,15 +31,32 @@ teacher_user = {
 }
 teacher_user_id = 4
 
+
+
+
 newt = {
     'family_name': 'Teacher',
     'name': 'New Teacher',
     'email': 'newt@cs.columbia.edu',
-    'given_name': 'New'
+    'given_name': 'New',
+    'locale': 'en',
+    'id': '7',
+    'hd': 'columbia.edu',
+    'verified_email': True
 }
-newt_id = 7
 
-student_user = 'cs4156'
+stu = {
+    'family_name': 'Dent',
+    'name': 'Stu Dent',
+    'email': 'cs4156@columbia.edu',
+    'given_name': 'Stu',
+    'locale': 'en',
+    'id': '6',
+    'hd': 'columbia.edu',
+    'verified_email': True
+}
+
+stu_id = 6
 
 
 def login(sess, user, userid):
@@ -53,25 +70,41 @@ def login(sess, user, userid):
 def db():
     imhere.app.secret_key = str(uuid.uuid4())
 
-@pytest.fixture(scope="module")
+@pytest.yield_fixture(scope="module")
 def filled_db():
     imhere.app.secret_key = str(uuid.uuid4())
+    
+    um = users_model.Users()
+    um.get_or_create_user(stu)
+    um.get_or_create_user(newt)
+
     m = model.Model()
     ds = m.get_client()
+        
+
+    key = ds.key('student')
+    entity = datastore.Entity(
+        key=key)
+    entity.update({
+        'sid': stu['id'],
+        'uni': 'cs4156'
+    })
+    ds.put(entity)
+
     key = ds.key('teacher')
     entity = datastore.Entity(
         key=key)
     entity.update({
-        'tid': newt_id
+        'tid': newt['id']
     })
     ds.put(entity)
 
-    tm = teachers_model.Teachers(newt_id)
+    tm = teachers_model.Teachers(newt['id'])
     course_name = 'Writing'
     cid = tm.add_course(course_name)
     cm = courses_model.Courses(cid)
-    cm.add_student(student_user)
-
+    cm.add_student('cs4156')
+    yield cid
 
 
 def test_index():
@@ -120,7 +153,7 @@ def test_teacher(db):
 def test_teacher_session_manage(filled_db):
     with imhere.app.test_client() as c:
         with c.session_transaction() as sess:
-            login(sess, newt, newt_id)
+            login(sess, newt, newt['id'])
             sess['is_teacher'] = True
 
         res = c.get('/teacher/')
@@ -128,15 +161,55 @@ def test_teacher_session_manage(filled_db):
         assert 'Open Attendance Window' in res.data
         assert 'Secret Code' not in res.data
 
-        payload = {'open': 2}
+        payload = {'open': filled_db}
         res = c.post('/teacher/', data=payload)
         assert 'Close Attendance Window' in res.data
         assert 'Secret Code' in res.data
 
-        payload = {'close': 2}
+        payload = {'close': filled_db}
         res = c.post('/teacher/', data=payload)
         assert 'Open Attendance Window' in res.data
         assert 'Secret Code' not in res.data
+
+def test_teacher_add_class(filled_db):
+    with imhere.app.test_client() as c:
+
+        # first lets test this page is properly gated
+        res = c.get('/teacher/add_class')
+        assert 302 == res.status_code
+
+        with c.session_transaction() as sess:
+            login(sess, newt, newt['id'])
+
+        res = c.get('/teacher/add_class')
+        assert 302 == res.status_code
+
+        with c.session_transaction() as sess:
+            sess['is_teacher'] = True
+
+        res = c.get('/teacher/add_class')
+        assert 'Create a Class' in res.data
+        assert 'Student Unis' in res.data
+        assert 200 == res.status_code
+
+        payload = {'unis': '', 'classname': 'newts variety hour'}
+        res = c.post('/teacher/add_class', data=payload, follow_redirects=True)
+        assert 'newts variety hour' in res.data
+        assert 'Add a Class' in res.data
+        assert 200 == res.status_code
+
+        payload = {'unis': 'fake', 'classname': 'newts big class'}
+        res = c.post('/teacher/add_class', data=payload)
+        assert "Invalid UNI's entered, please recreate the class" in res.data
+
+        payload = {'unis': 'cs4156', 'classname': 'newts big class'}
+        res = c.post('/teacher/add_class', data=payload, follow_redirects=True)
+        assert 'newts big class' in res.data
+        assert 'Add a Class' in res.data
+        assert 200 == res.status_code
+
+
+
 
 
 """
@@ -213,7 +286,7 @@ def test_teacher_session_manage(db):
     with imhere.app.test_client() as c:
 
         with c.session_transaction() as sess:
-            login(sess, newt, newt_id)
+            login(sess, newt, newt['id'])
             sess['is_teacher'] = True
 
         res = c.get('/teacher/')
@@ -240,7 +313,7 @@ def test_teacher_add_class(db):
         assert 302 == res.status_code
 
         with c.session_transaction() as sess:
-            login(sess, newt, newt_id)
+            login(sess, newt, newt['id'])
 
         res = c.get('/teacher/add_class')
         assert 302 == res.status_code
@@ -284,7 +357,7 @@ def test_teacher_remove_class(db):
         assert 302 == res.status_code
 
         with c.session_transaction() as sess:
-            login(sess, newt, newt_id)
+            login(sess, newt, newt['id'])
 
         res = c.get('/teacher/remove_class')
         assert 302 == res.status_code
@@ -309,7 +382,7 @@ def test_teacher_view_class(db):
     with imhere.app.test_client() as c:
 
         with c.session_transaction() as sess:
-            login(sess, newt, newt_id)
+            login(sess, newt, newt['id'])
             sess['is_teacher'] = True
 
         query = "select cid from courses where name = 'newts big class'"

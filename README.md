@@ -10,6 +10,7 @@ TODO on README
 - Setting up Datastore emulator
 - pip install --upgrade google-cloud-datastore
 - https://cloud.google.com/datastore/docs/reference/libraries#client-libraries-install-python
+- Prospector
 
 ## Local Installation
 Install Git, Google Cloud SDK, Python 2.7, Pip, Virtualenv (optional)

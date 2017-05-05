@@ -2,6 +2,9 @@ credentials.tar.gz
 client-secret.json
 api_key.py
 
+
+*.pyc
+__pycache__/
 .*~
 *~
 
