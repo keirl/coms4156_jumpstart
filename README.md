@@ -4,6 +4,7 @@ Jumpstart Project for Columbia University's COMS 4156
 ## Getting Started
 One person will need to be "Devops" for the duration of the project (pick someone who won't drop the class.)  This person will need to own the GitHub repo and all the other tools.  
 
+TODO on README
 - Getting OAuth key
 - Setting up permissions for group members
 - Setting up Datastore emulator
