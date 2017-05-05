@@ -4,8 +4,10 @@ Jumpstart Project for Columbia University's COMS 4156
 ## Getting Started
 One person will need to be "Devops" for the duration of the project (pick someone who won't drop the class.)  This person will need to own the GitHub repo and all the other tools.  
 
+[Visit the wiki to learn more about this project](https://github.com/keirl/coms4156_jumpstart/wiki/)
+
 TODO on README
-- Getting OAuth key
+- Move Oauth key from wiki to README ?
 - Setting up permissions for group members
 - Setting up Datastore emulator
 - pip install --upgrade google-cloud-datastore
