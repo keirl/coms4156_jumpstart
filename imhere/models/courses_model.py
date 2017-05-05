@@ -134,7 +134,14 @@ class Courses(Model):
         # auto-generated secret code for now
         randsecret = randint(1000, 9999)
 
-        key = self.ds.key('sessions')
+        # check if course already has a session
+        query = self.ds.query(kind='sessions')
+        query.add_filter('cid', '=', int(self.cid))
+        sessions = list(query.fetch())
+        if len(sessions) == 1:
+            key = sessions[0].key
+        else:
+            key = self.ds.key('sessions')
         entity = datastore.Entity(
             key=key)
         entity.update({
