@@ -33,9 +33,11 @@ class Students(Model):
         for enrolled in enrolledIn:
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', enrolled['cid'])
-            # TODO datastore fix sessions
-            query.add_filter('expires', '>', datetime.now())
-            results = results + list(query.fetch())
+            sessions = list(query.fetch())
+            for session in sessions:
+                if session['expires'].replace(tzinfo=None) > datetime.now():
+                    results.append(session)
+            # results = results + list(query.fetch())
         if len(results) == 1:
             secret = results[0]['secret']
             seid = results[0]['seid']

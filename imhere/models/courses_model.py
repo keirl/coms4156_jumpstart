@@ -98,11 +98,15 @@ class Courses(Model):
         '''Return the seid of an active session if it exists,
         otherwise return -1.
         '''
-        # TODO fix expiration
         query = self.ds.query(kind='sessions')
         query.add_filter('cid', '=', int(self.cid))
         sessions = list(query.fetch())
-        return sessions[0]['seid'] if len(sessions) == 1 else -1
+        results = list()
+        for session in sessions:
+            if session['expires'].replace(tzinfo=None) > datetime.now():
+                results.append(session)
+
+        return results[0]['seid'] if len(results) == 1 else -1
 
     def close_session(self, seid):
         if seid == -1:
@@ -115,8 +119,6 @@ class Courses(Model):
             'expires': datetime.now()
         })
         self.ds.put(entity)
-
-        # TODO fix expiration
 
         query = self.ds.query(kind='courses')
         query.add_filter('cid', '=', int(self.cid))
@@ -134,14 +136,7 @@ class Courses(Model):
         # auto-generated secret code for now
         randsecret = randint(1000, 9999)
 
-        # check if course already has a session
-        query = self.ds.query(kind='sessions')
-        query.add_filter('cid', '=', int(self.cid))
-        sessions = list(query.fetch())
-        if len(sessions) == 1:
-            key = sessions[0].key
-        else:
-            key = self.ds.key('sessions')
+        key = self.ds.key('sessions')
         entity = datastore.Entity(
             key=key)
         entity.update({
@@ -177,9 +172,10 @@ class Courses(Model):
         for course in courses:
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', course['cid'])
-            # TODO datastore fix sessions
-            query.add_filter('expires', '>', datetime.now())
-            results = results + list(query.fetch())
+            sessions = list(query.fetch())
+            for session in sessions:
+                if session['expires'].replace(tzinfo=None) > datetime.now():
+                    results.append(session)
         return results[0]['secret'] if len(results) == 1 else None
 
     def get_num_sessions(self):

@@ -30,14 +30,15 @@ class Teachers(Model):
             query = self.ds.query(kind='courses')
             query.add_filter('cid', '=', teach['cid'])
             courses = courses + list(query.fetch())
-        # sessions = list()
+        results = list()
         for course in courses:
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', course['cid'])
-            # TODO datastore fix sessions
-            # query.add_filter('expires', '>', datetime.now())
             sessions = list(query.fetch())
-            if len(sessions) > 0:
+            for session in sessions:
+                if session['expires'].replace(tzinfo=None) > datetime.now():
+                    results.append(session)
+            if len(results) == 1:
                 course['secret'] = sessions[0]['secret']
 
         # result = courses + sessions
