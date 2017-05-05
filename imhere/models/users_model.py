@@ -3,30 +3,30 @@ from google.cloud import datastore
 
 class Users(Model):
 
-    def get_or_create_user(self, user):
-        ds = self.get_client()
-        query = ds.query(kind='user')
-        query.add_filter('email', '=', user['email'])
+    def __init__(self):
+        self.ds = self.get_client()
 
+    def get_or_create_user(self, user):
+        query = self.ds.query(kind='user')
+        query.add_filter('email', '=', user['email'])
         result = list(query.fetch())
         if result:
             print result
         else:
             try:
-                key = ds.key('user')
+                key = self.ds.key('user')
                 entity = datastore.Entity(
                     key=key)
                 entity.update(user)
-                ds.put(entity)
+                self.ds.put(entity)
             except:  # TODO
                 pass
         result = list(query.fetch())
         return result[0]['id']
 
 
-    def is_valid_uni(self, uni): # TODO verify functionality
-        ds = self.get_client()
-        query = ds.query(kind='student')
+    def is_valid_uni(self, uni):
+        query = self.ds.query(kind='student')
         query.add_filter('uni', '=', uni)
         result = list(query.fetch())
         return True if len(result) == 1 else False

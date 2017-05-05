@@ -241,7 +241,6 @@ def view_class():
             students_with_ar.append([student, student_uni, num_ar])
 
         context = dict(students=students_with_ar)
-
         return render_template(
                 'view_class.html',
                 cid=cid,

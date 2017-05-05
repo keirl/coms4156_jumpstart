@@ -98,28 +98,19 @@ class Courses(Model):
         '''Return the seid of an active session if it exists,
         otherwise return -1.
         '''
-        # query = ('select seid from sessions '
-        #          'where cid = %s '
-        #          "and expires > '%s' "
-        #          "and day >= '%s'"
-        #          % (self.cid, self.now, self.today))
-        # result = self.db.execute(query)
-        # return result.fetchone()[0] if result.rowcount == 1 else -1
-        # TODO fix expiration
         query = self.ds.query(kind='sessions')
         query.add_filter('cid', '=', int(self.cid))
         sessions = list(query.fetch())
-        return sessions[0]['seid'] if len(sessions) == 1 else -1
+        results = list()
+        for session in sessions:
+            if session['expires'].replace(tzinfo=None) > datetime.now():
+                results.append(session)
+
+        return results[0]['seid'] if len(results) == 1 else -1
 
     def close_session(self, seid):
         if seid == -1:
             return
-
-        # query = ('update sessions '
-        #          "set expires = '%s' "
-        #          'where seid = %s'
-        #          % (self.now, seid))
-        # self.db.execute(query)
 
         query = self.ds.query(kind='sessions')
         query.add_filter('seid', '=', int(seid))
@@ -128,11 +119,6 @@ class Courses(Model):
             'expires': datetime.now()
         })
         self.ds.put(entity)
-
-        # TODO fix expiration
-
-        # query = 'update courses set active = 0 where cid = %s' % self.cid
-        # self.db.execute(query)
 
         query = self.ds.query(kind='courses')
         query.add_filter('cid', '=', int(self.cid))
@@ -149,10 +135,6 @@ class Courses(Model):
         '''
         # auto-generated secret code for now
         randsecret = randint(1000, 9999)
-        # query = ('insert into sessions (cid, secret, expires, day) '
-        #          "values (%s, '%d', '%s', '%s')"
-        #          % (self.cid, randsecret, '23:59:59', self.today))
-        # self.db.execute(query)
 
         key = self.ds.key('sessions')
         entity = datastore.Entity(
@@ -161,7 +143,6 @@ class Courses(Model):
             'cid': int(self.cid),
             'secret': int(randsecret),
             'expires': datetime.now() + timedelta(days=1)
-            # 'day': self.today
         })
         self.ds.put(entity)
         seid = entity.key.id
@@ -191,10 +172,10 @@ class Courses(Model):
         for course in courses:
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', course['cid'])
-            # TODO datastore fix sessions
-            # query.add_filter('expires', '>', self.now)
-            # query.add_filter('day', '>=', self.today)
-            results = results + list(query.fetch())
+            sessions = list(query.fetch())
+            for session in sessions:
+                if session['expires'].replace(tzinfo=None) > datetime.now():
+                    results.append(session)
         return results[0]['secret'] if len(results) == 1 else None
 
     def get_num_sessions(self):
