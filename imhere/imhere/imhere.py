@@ -42,7 +42,6 @@ def student_session():
         if 'credentials' not in flask.session:
             return flask.redirect(flask.url_for('index'))
         elif not flask.session['is_student']:
-            print "help i'm not a student?? " + str(flask.session['is_student'])
             return flask.redirect(flask.url_for('register'))
 
 
@@ -120,9 +119,7 @@ def main_student():
         if 'secret_code' in request.form.keys():
             provided_secret = request.form['secret_code']
             actual_secret, seid = sm.get_secret_and_seid()
-            print "actual secret " + str(actual_secret)
-            print "given secret " + str(provided_secret)
-            if provided_secret == actual_secret:
+            if int(provided_secret) == int(actual_secret):
                 sm.insert_attendance_record(seid)
                 valid = True
             else:
@@ -153,7 +150,6 @@ def main_teacher():
     courses = tm.get_courses_with_session()
     empty = True if len(courses) == 0 else False
     context = dict(data=courses)
-    print "here is the context!!!!!!!!!!! " + str(context)
     return render_template('main_teacher.html', empty=empty, **context)
 
 

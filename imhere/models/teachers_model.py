@@ -73,3 +73,10 @@ class Teachers(Model):
     def remove_course(self, cid):
         key = self.ds.key('courses', int(cid))
         self.ds.delete(key)
+
+        # remove course from students' enrolled list
+        query = self.ds.query(kind='enrolled_in')
+        query.add_filter('cid', '=', int(cid))
+        results = list(query.fetch())
+        for result in results:
+            self.ds.delete(result.key)
