@@ -8,7 +8,7 @@ import oauth2client
 import apiclient
 import flask
 
-import sqlalchemy
+#import sqlalchemy
 
 from flask import Flask, render_template, request, g
 from models import users_model, index_model, teachers_model, students_model, \

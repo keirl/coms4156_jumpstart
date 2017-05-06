@@ -4,7 +4,7 @@ Jumpstart Project for Columbia University's COMS 4156
 ## Getting Started
 One person will need to be "Devops" for the duration of the project (pick someone who won't drop the class.)  This person will need to own the GitHub repo and all the other tools.  
 
-[Visit the wiki to learn more about this project](https://github.com/keirl/coms4156_jumpstart/wiki/)
+[Visit the wiki to learn more about this project](wiki/)
 
 TODO on README
 - Move Oauth key from wiki to README ?
@@ -14,36 +14,6 @@ TODO on README
 - https://cloud.google.com/datastore/docs/reference/libraries#client-libraries-install-python
 - Prospector
 
-## Local Installation
-Install Git, Google Cloud SDK, Python 2.7, Pip, Virtualenv (optional)
-
-
-#### Install virtual machine (Optional)
-We recommend installing Linux (Ubuntu 14.04) and using it for local development.  The principal motivation is to ensure library and application compatibility with your continuous integration and deployment (Travis and Google App Engine) chain.  If you have to do something special in your environment, then you will need to do it on deployment.  We especially recommend this if your team has a mixture of Macs and Windows or just Windows machines.  Diligent use of `virtualenv` can overcome library issues on Macs and Linux machines.
-
-There are some side benefits as well, namely, you can destroy and rebuild the VM without affecting the rest of your computer.  One of the authors has still not removed all unnecessary libraries and tools.
-
-1. Download and install VirtualBox.
-2. Download Ubuntu 14.04.
-3. Install Ubunut 14.04.
-4. Setup your VirtualBox (Number of CPUs, memory)
-5. Update Ubuntu.
-6. Install VirtualBox additions.  (Ubuntu 14.04 has a VirtualBox additions built in; however it is often out of date.)
-  - Mount .iso in virtualbox
-  - Run VirtualBox additions
-  - Shared clipboard
-
-
-#### Install Local Files (Ubuntu 14.04 Commands)
-Install Git, Pip, Virtualenv, Ruby, [Google Cloud SDK](https://cloud.google.com/sdk/docs/#deb)
-
-    sudo apt-get install git python-pip ruby ruby-dev
-    sudo pip install virtualenv
-    # The following is to install Google SDK    
-    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"
-    echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-    sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 #### Setup GitHub.com Account
 Create a GitHub [account](https://github.com/).
