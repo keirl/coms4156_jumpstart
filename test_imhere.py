@@ -59,6 +59,7 @@ stu = {
 stu_id = 6
 
 
+
 def login(sess, user, userid):
     sess['credentials'] = 'blah'
     sess['google_user'] = user
@@ -208,6 +209,34 @@ def test_teacher_add_class(filled_db):
         assert 'Add a Class' in res.data
         assert 200 == res.status_code
 
+def test_teacher_remove_class(db):
+    with imhere.app.test_client() as c:
+
+        # first check page is auth protected
+
+        res = c.get('/teacher/remove_class')
+        assert 302 == res.status_code
+
+        with c.session_transaction() as sess:
+            login(sess, newt, newt['id'])
+
+        res = c.get('/teacher/remove_class')
+        assert 302 == res.status_code
+
+        with c.session_transaction() as sess:
+            sess['is_teacher'] = True
+
+        res = c.get('/teacher/remove_class')
+        assert 'Class List' in res.data
+        assert 'Remove Class' in res.data
+        assert 'Newts big blunder' in res.data
+        assert 200 == res.status_code
+
+        payload = {'cid': 5}
+        res = c.post('/teacher/remove_class', data=payload, follow_redirects=True)
+        assert 'Add Class' in res.data
+        assert 'Newts big blunder' not in res.data
+        assert 200 == res.status_code
 
 
 
