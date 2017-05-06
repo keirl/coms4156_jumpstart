@@ -97,6 +97,7 @@ ENV/
 imhere/client_secrets.json
 imhere/cred.json
 credentials.tar.gz
+client_secrets_oauth.json
 imhere/client_secrets_oauth.json
 
 # Backup files
