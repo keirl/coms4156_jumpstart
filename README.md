@@ -49,17 +49,41 @@ Check that Flask is listed
     
     pip list
 
+    apiclient (1.0.3)
     appdirs (1.4.3)
+    cachetools (2.0.0)
     click (6.7)
+    dill (0.2.6)
+    enum34 (1.1.6)
     Flask (0.12.1)
+    future (0.16.0)
+    futures (3.1.1)
+    gapic-google-cloud-datastore-v1 (0.15.3)
+    google-auth (1.0.0)
+    google-auth-httplib2 (0.0.2)
+    google-cloud-core (0.24.1)
+    google-cloud-datastore (1.0.0)
+    google-gax (0.15.11)
+    googleapis-common-protos (1.5.2)
+    grpcio (1.3.0)
+    httplib2 (0.10.3)
     itsdangerous (0.24)
     Jinja2 (2.9.6)
     MarkupSafe (1.0)
+    oauth2client (3.0.0)
     packaging (16.8)
     pip (9.0.1)
+    ply (3.8)
+    proto-google-cloud-datastore-v1 (0.90.4)
+    protobuf (3.3.0)
+    pyasn1 (0.2.3)
+    pyasn1-modules (0.0.8)
     pyparsing (2.2.0)
+    requests (2.13.0)
+    rsa (3.4.2)
     setuptools (35.0.2)
     six (1.10.0)
+    urllib3 (1.21.1)
     Werkzeug (0.12.1)
     wheel (0.29.0)
 
@@ -68,7 +92,7 @@ You should also update the requirements.txt file, `pip freeze > requirements.txt
 #### Test the local environment
 Run the Flask application 
     
-    export FLASK_APP=main.py
+    export FLASK_APP=run.py
     flask run
 
 Navigate to the local web site at [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
