@@ -2,14 +2,12 @@
 
 import os
 import httplib2
-import uuid
 
 import oauth2client
 import apiclient
 import flask
 
-#import sqlalchemy
-
+from uuid import uuid4
 from flask import Flask, render_template, request, g
 from models import users_model, index_model, teachers_model, students_model, \
         courses_model, model
@@ -18,6 +16,7 @@ from google.cloud import datastore
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
+app.secret_key = str(uuid4())
 
 
 
