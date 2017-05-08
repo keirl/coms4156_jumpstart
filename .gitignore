@@ -94,11 +94,10 @@ ENV/
 .ropeproject
 
 # imhere client secrets
-imhere/client_secrets.json
-imhere/cred.json
+client_secrets.json
+cred.json
 credentials.tar.gz
 client_secrets_oauth.json
-imhere/client_secrets_oauth.json
 
 # Backup files
 *.*~

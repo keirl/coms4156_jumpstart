@@ -23,8 +23,8 @@ deploy:
     provider: gae
     # Skip cleanup so api_key.py and vendored dependencies are still there
     skip_cleanup: true
-    keyfile: client-secret.json
-    project: astute-anagram-165723
+    keyfile: cred.json
+    project: test-4156
     default: true
     on:
         all_branches: true
