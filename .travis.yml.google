@@ -24,7 +24,7 @@ deploy:
     # Skip cleanup so api_key.py and vendored dependencies are still there
     skip_cleanup: true
     keyfile: cred.json
-    project: test-4156
+    project: test-4156 #### This is your project name
     default: true
     on:
         all_branches: true
