@@ -11,9 +11,14 @@ addons:
         organization: "larrylzhao-github" # the key of the org you chose at step #3
         token:
             secure: SONAR_TOKEN # encrypted value of your token
+jdk:
+    - oraclejdk8
 script:
     # other script steps might be done before running the actual SonarQube analysis
     - sonar-scanner
+cache:
+    directories:
+        - '$HOME/.sonar/cache'
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_d4d6810438b5_key -iv $encrypted_d4d6810438b5_iv
