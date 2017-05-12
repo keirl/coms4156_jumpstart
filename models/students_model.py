@@ -28,9 +28,9 @@ class Students(Model):
 
     def get_secret_and_seid(self):
         query = self.ds.query(kind='enrolled_in')
-        enrolledIn = list(query.fetch())
+        enrolled_in = list(query.fetch())
         results = list()
-        for enrolled in enrolledIn:
+        for enrolled in enrolled_in:
             query = self.ds.query(kind='sessions')
             query.add_filter('cid', '=', enrolled['cid'])
             sessions = list(query.fetch())

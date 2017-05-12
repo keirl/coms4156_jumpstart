@@ -20,9 +20,9 @@ class Courses(Model):
     def get_students(self):
         query = self.ds.query(kind='enrolled_in')
         query.add_filter('cid', '=', int(self.cid))
-        enrolledIn = list(query.fetch())
+        enrolled_in = list(query.fetch())
         results = list()
-        for enrolled in enrolledIn:
+        for enrolled in enrolled_in:
             query = self.ds.query(kind='user')
             query.add_filter('id', '=', enrolled['sid'])
             results = results + list(query.fetch())
