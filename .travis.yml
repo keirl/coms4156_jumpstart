@@ -10,7 +10,7 @@ addons:
     sonarqube:
         organization: "larrylzhao-github" # the key of the org you chose at step #3
         token:
-            secure: SONAR_TOKEN # encrypted value of your token
+            secure: "SONAR_TOKEN" # encrypted value of your token
 jdk:
     - oraclejdk8
 script:
