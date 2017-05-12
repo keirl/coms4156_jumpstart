@@ -7,22 +7,30 @@ python:
 - '2.7'
 
 
+addons:
+    sonarqube:
+        organization: "larrylzhao-github" # the key of the org you chose at step #3
+        token:
+            secure: SONAR_TOKEN
+
 cache:
     directories:
         - '$HOME/.sonar/cache'
 
 before_install:
-- openssl aes-256-cbc -K $encrypted_d4d6810438b5_key -iv $encrypted_d4d6810438b5_iv
-  -in credentials.tar.gz.enc -out credentials.tar.gz -d
-# If the SDK is not already cached, download it and unpack it
-- tar -xzf credentials.tar.gz
-- mkdir -p lib
+    - openssl aes-256-cbc -K $encrypted_d4d6810438b5_key -iv $encrypted_d4d6810438b5_iv
+      -in credentials.tar.gz.enc -out credentials.tar.gz -d
+    # If the SDK is not already cached, download it and unpack it
+    - tar -xzf credentials.tar.gz
+    - mkdir -p lib
 
 install:
-# Install the Python dependencies
-- pip install -r requirements.txt -t lib/
+    # Install the Python dependencies
+    - pip install -r requirements.txt -t lib/
 script:
-- echo "No Script to run"
+    - echo "No Script to run"
+    # other script steps might be done before running the actual SonarQube analysis
+    - sonar-scanner
 
 deploy:
     provider: gae
@@ -34,13 +42,4 @@ deploy:
     on:
         all_branches: true
 
-addons:
-    sonarqube:
-        organization: "larrylzhao-github" # the key of the org you chose at step #3
-        token:
-            secure: "UdepAIFP3PMgNuDF71sGmunBi2xYX1uP3cDMjmHfVBH37dLwQfYSz+32Pw+ouZFMWP8OPDqOk7a8nZU4Vo1tjp2P/LY49zcoYb9VSiIQ/I6PcUZ6rR52Pri4PcB0vejM+lPrczIzCu+foYYZuwxe34q2SEbiGBqklCjV30WMhs4hgnQdhoWHg99xEkrP29kJeA88kTZfzD7M70L7tEnHkaXhN7s+jX0gvrGS2Xccmh1LU+A3mqs11hHBCptRWGFcjEFZnvdoYeGxxLQDt25x4ZGW6210vcWP8uNJbS7xdT4CQ7NgN9J2XfwaMtRoL/1yGdz/h4RyFSVJ8QCii7Nc66T0zCAjkRgGZdrVeC67Chmesd5exfWfr72NYClN3FrppV+75hZ7WBHmb+D/xv0vkRNIkWL2fdeagM7okX4fuOIk44VgjKAde+RGPUtP+FUZffDE9TP/nu7V3cRtyXCeTfO8C8vV7kIWD7Y06Lgu0rD35Tf6djkAXIGZTiFZtmLX/jjA+A/YZw7gC2eBv88Mxx33XE8RhpezLA92J0qFoBSjxbHgU9UuhabRXzNRYW+BtQRDiK4IK5KtjxuatoC8qZo+jU0VuIp+6t+lhhYdvQsAQyaupKtr1wAHY+POj+aiA1INY9dSyGHL+GjZckdjHF3zUIihEIb1vjhjOzisqh8="
-jdk:
-    - oraclejdk8
-script:
-    # other script steps might be done before running the actual SonarQube analysis
-    - sonar-scanner
+
