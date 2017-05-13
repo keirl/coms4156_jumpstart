@@ -31,7 +31,7 @@ script:
     - echo "No Script to run"
 
     # other script steps might be done before running the actual SonarQube analysis
-    - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
+   # - build-wrapper-linux-x86-64 --out-dir bw-output make clean all
     - sonar-scanner
 
 deploy:
