@@ -6,6 +6,18 @@ language: python
 python:
 - '2.7'
 
+# Uncomment this section to enable sonarqube.
+# Be sure to uncomment the script in the script section as well
+# addons:
+#     sonarqube:
+#         organization: "" # the key of the org you chose at step #3
+#         token:
+#             secure: ""
+#
+# cache:
+#     directories:
+#       - '$HOME/.sonar/cache'
+
 before_install:
 - mkdir -p lib
 
@@ -14,3 +26,4 @@ install:
 - pip install -r requirements.txt -t lib/
 script:
 - echo "No Script to run"
+# - sonar-scanner
